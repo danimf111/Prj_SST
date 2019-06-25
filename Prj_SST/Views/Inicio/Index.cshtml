@@ -1,0 +1,27 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+            MostrarPNotify("@ViewBag.Message.TipoAlerta", "@ViewBag.Message.Titulo", "@ViewBag.Message.Mensaje");
+        };
+    </script>
+}
+<div class="panel panel-flat">
+    @*<div class="panel-heading">
+        <div class="thumbnail">
+            <div class="thumb">
+                <img src="~/Images/ImagenInicio1.jpg" alt="">
+            </div>
+        </div>
+        <br />
+        <div class="thumbnail">
+            <div class="thumb">
+                <img src="~/Images/ImagenInicio2.jpg" alt="">
+            </div>
+        </div>
+        <br />
+    </div>*@
+</div>

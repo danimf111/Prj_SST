@@ -1,0 +1,198 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    window.onload = function () {
+        document.getElementById("PanelDatos").style.visibility = 'hidden';
+    }
+
+    function Consultar() {
+        var _fechaInicial = document.getElementById("txtFechaInicial").value;
+        var _fechaFinal = document.getElementById("txtFechaFinal").value;
+        var _usuario = document.getElementById("txtUsuario").value;
+        var _asociado = document.getElementById("txtAsociado").value;
+
+        var _objDatos = {};
+        var _actionURL = "/Auditorias/ConsultarScore";
+
+        if (_fechaInicial == null || _fechaInicial.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar la fecha inicial");
+        } else if (_fechaFinal == null || _fechaFinal.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar la fecha final");
+        } else {
+            _objDatos.FechaInicial = _fechaInicial;
+            _objDatos.FechaFinal = _fechaFinal;
+            _objDatos.Usuario = _usuario;
+            _objDatos.Asociado = _asociado;
+
+            BloquearPagina()
+            $.post(_actionURL, _objDatos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        document.getElementById("PanelDatos").style.visibility = 'hidden';
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        LlenarDatos(_resultado);
+                    }
+                }
+            });
+        }
+    }
+
+    function LlenarDatos(Pdatos) {
+        _datos = JSON.parse(Pdatos);
+        if (_datos != null && _datos.length > 0) {
+            document.getElementById("PanelDatos").style.visibility = 'visible';
+            $("#tablaDatosAuditoria").empty();
+            $("#TablaAuditoria").empty();
+
+
+            var tbl = $("<table/>").attr("id", "TablaAuditoria");
+            tbl.attr("class", "table");
+            $("#tablaDatosAuditoria").append(tbl);
+
+
+            var InicioEncabezado = "<thead>"
+            var InicioFila = "<tr>"
+            var EncabezadoFechaConsulta = "<th class='text-bold'>Fecha consulta</th>"
+            var EncabezadoAsociado = "<th class='text-bold'>Asociado</th>"
+            var EncabezadoTipoDoc = "<th class='text-bold'>Tipo identificación</th>"
+            var EncabezadoProveedor = "<th class='text-bold'>Proveedor</th>"
+            var EncabezadoCodInfo = "<th class='text-bold'>Codigo información</th>"
+            var EncabezadoMotivoConsulta = "<th class='text-bold'>Motivo consulta</th>"
+            var EncabezadoOrigenDatos = "<th class='text-bold'>Origen datos</th>"
+            var EncabezadoOficina = "<th class='text-bold'>Oficina</th>"
+            var EncabezadoUsuario = "<th class='text-bold'>Usuario</th>"
+            var EncabezadoNombreUsuario = "<th class='text-bold'>Nombre usuario</th>"
+            var FinFila = "</tr>"
+            var FinEncabezado = "</thead>"
+
+            $("#TablaAuditoria").append(InicioEncabezado + InicioFila
+                + EncabezadoFechaConsulta + EncabezadoTipoDoc + EncabezadoAsociado + EncabezadoProveedor + EncabezadoCodInfo + EncabezadoMotivoConsulta + EncabezadoOrigenDatos + EncabezadoOficina +
+                EncabezadoUsuario + EncabezadoNombreUsuario + FinFila + FinEncabezado);
+
+            var ContenidoAbre = '<tbody>';
+            var ContenidoCierra = ' </tbody>';
+
+            $("#TablaAuditoria").append(ContenidoAbre);
+            for (var i = 0; i < _datos.length; i++) {
+                var InicioFila = "<tr>";
+                var _FechaConsulta = _datos[i]["FechaConsulta"];
+                var _Caracteres = /-?\d+/;
+                var _valor = _Caracteres.exec(_FechaConsulta);
+                var _Fecha = new Date(parseInt(_valor[0]));
+
+                var _dia = ("0" + (_Fecha.getDate())).slice(-2);
+                var _mes = ("0" + (_Fecha.getMonth() + 1)).slice(-2);
+                var _ano = _Fecha.getFullYear();
+
+                var columna1 = "<td>" + _ano + "-" + _mes + "-" + _dia + "</td>";
+                var columna2 = "<td>" + _datos[i]["TipoIdentificacion"] + "</td>";
+                var columna3 = "<td>" + _datos[i]["IdAsociado"] + "</td>";
+                var columna4 = "<td>" + _datos[i]["NIT"] + "</td>";
+                var columna5 = "<td>" + _datos[i]["CodInformacion"] + "</td>";
+                var columna6 = "<td>" + _datos[i]["MotivoConsulta"] + "</td>";
+                var columna7 = "<td>" + _datos[i]["OrigenDatos"] + "</td>";
+                var columna8 = "<td>" + _datos[i]["Oficina"] + "</td>";
+                var columna9 = "<td>" + _datos[i]["Usuario"] + "</td>";
+                var columna10 = "<td>" + _datos[i]["NombreUsuario"] + "</td>";
+                var FinFila = "</tr>";
+
+                $("#TablaAuditoria").append(InicioFila + columna1 + columna2 + columna3 + columna4 + columna5 + columna6 + columna7 + columna8 + columna9 + columna10 + FinFila);
+            }
+            $("#TablaAuditoria").append(ContenidoCierra);
+        } else {
+            MostrarPNotify("Error", "", "No se encontraron datos");
+            document.getElementById("PanelDatos").style.visibility = 'hidden';
+            $("#tablaDatosAuditoria").empty();
+            $("#TablaAuditoria").empty();
+        }
+    }
+</script>
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class="icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <label>Fecha inicial:</label><span class="text-danger"> *</span>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                    <input type="text" id="txtFechaInicial" class="form-control calendario" value="@DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")">
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <label>Fecha final:</label><span class="text-danger"> *</span>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                    <input type="text" id="txtFechaFinal" class="form-control calendario" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <div class="form-group">
+                    <label>Usuario:</label>
+                    <input type="text" class="form-control" id="txtUsuario" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <div class="form-group">
+                    <label>Asociado:</label>
+                    <input type="text" class="form-control" id="txtAsociado" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12 text-right">
+                <input type="submit" id="btnConsultar" class="btn Gt-btn-verde" value="Consultar" onclick="Consultar()" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelDatos">
+    <div class="panel-body ">
+        <div class="table-responsive scrollTabla">
+            <table id="TablaAuditoria" class="table table-hover"></table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->

@@ -1,0 +1,641 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    window.onload = function () {
+        document.getElementById("PanelDatos").style.visibility = 'hidden';
+    };
+
+    //Consulta la información del asociado en visionamos
+    function Consultar() {
+        LimpiarCampos();
+        var _identificacion = document.getElementById("txtIdentificacion").value;
+        var _objDatos = {};
+
+        if (_identificacion.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar el número de identificación");
+        } else {
+            _objDatos.NumeroDocumento = _identificacion;
+            var _actionURL = "/Disponibles/ConsultarAsociado";
+
+            BloquearPagina();
+            $.post(_actionURL, _objDatos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        document.getElementById("PanelDatos").style.visibility = 'hidden';
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        LlenarDatos(_resultado);
+                    }
+                }
+            })
+        }
+    }
+
+    //Llena la informacion del asociado
+    function LlenarDatos(PDatos) {
+        if (PDatos != null) {
+            document.getElementById("PanelDatos").style.visibility = 'visible';
+            document.getElementById("txtNumIdent").value = (PDatos.NumeroDocumento == null) ? '' : PDatos.NumeroDocumento;
+            document.getElementById("txtTipoDoc").value = (PDatos.NombreTipoDocumento == null) ? '' : PDatos.NombreTipoDocumento;
+            document.getElementById("txtFechaExped").value = (PDatos.FechaExpedicion == null) ? '' : PDatos.FechaExpedicion;
+            document.getElementById("txtNombre").value = (PDatos.Nombre == null) ? '' : PDatos.Nombre;
+            document.getElementById("txtFechaNacimiento").value = (PDatos.FechaNacimiento == null) ? '' : PDatos.FechaNacimiento;
+            document.getElementById("txtDireccion").value = (PDatos.DireccionResidencia == null) ? '' : PDatos.DireccionResidencia;
+            document.getElementById("txtTelefono").value = (PDatos.TelefonoResidencia == null) ? '' : PDatos.TelefonoResidencia;
+            document.getElementById("txtCelular").value = (PDatos.Celular == null) ? '' : PDatos.Celular;
+            document.getElementById("txtEmail").value = (PDatos.Email == null) ? '' : PDatos.Email;
+            document.getElementById("txtTipoDocumento").value = (PDatos.TipoDocumento == null) ? '' : PDatos.TipoDocumento;
+
+            if (PDatos.ActivarSMS)
+                document.getElementById("chkEnvioSMS").checked = true;
+            else
+                document.getElementById("chkEnvioSMS").checked = false;
+
+            if (PDatos.ActivarOTP)
+                document.getElementById("chkValidacionOTP").checked = true;
+            else
+                document.getElementById("chkValidacionOTP").checked = false;
+        }
+    }
+
+    //Limpia los campos
+    function LimpiarCampos() {
+        document.getElementById("txtNumIdent").value = '';
+        document.getElementById("txtTipoDoc").value = '';
+        document.getElementById("txtFechaExped").value = '';
+        document.getElementById("txtNombre").value = '';
+        document.getElementById("txtFechaNacimiento").value = '';
+        document.getElementById("txtDireccion").value = '';
+        document.getElementById("txtTelefono").value = '';
+        document.getElementById("txtCelular").value = '';
+        document.getElementById("txtEmail").value = '';
+        document.getElementById("txtTipoDocumento").value = '';
+        document.getElementById("chkEnvioSMS").checked = false;
+        document.getElementById("chkValidacionOTP").checked = false;
+    }
+
+    //Consultar las cuentas
+    function ConsultarCuentas() {
+        var _identificacion = document.getElementById("txtNumIdent").value;
+        var _tipoDocumento = document.getElementById("txtTipoDocumento").value;
+        var _objDatos = {};
+
+        _objDatos.NumeroDocumento = _identificacion;
+        _objDatos.TipoDocumento = _tipoDocumento;
+
+        var _actionURL = "/Disponibles/ConsultarCuentas";
+
+        BloquearPagina();
+        $.post(_actionURL, _objDatos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+
+                    $("#tablaDatosCuentas").empty();
+                    var _cuentas = JSON.parse(_resultado);
+
+                    var tbl = $("<table/>").attr("id", "TablaCuentas");
+                    tbl.attr("class", "table");
+                    $("#tablaDatosCuentas").append(tbl);
+
+                    //Se crean los encabezados de la tabla
+                    var EncabezadoAbre = '<thead> <tr>';
+                    var EncabezadoCuenta = ' <th class="text-bold">' + "Cuenta" + "</th>";
+                    var EncabezadoAlias = '<th class="text-bold">' + "CTI" + "</th>";
+                    var EncabezadoTipoCuenta = '<th class="text-bold">' + "Tipo de cuenta" + "</th>";
+                    var EncabezadoEstadoCuenta = '<th class="text-bold">' + "Estado cuenta" + "</th>";
+                    var EncabezadoSaldo = '<th class="text-bold">' + "Saldo" + "</th>";
+                    var EncabezadoCierra = '</tr></thead>';
+
+                    var ContenidoAbre = '<tbody>';
+                    var ContenidoCierra = ' </tbody>';
+
+                    $("#TablaCuentas").append(EncabezadoAbre + EncabezadoCuenta + EncabezadoAlias + EncabezadoTipoCuenta + EncabezadoEstadoCuenta + EncabezadoSaldo + EncabezadoCierra + ContenidoAbre);
+
+                    for (var i = 0; i < _cuentas.length; i++) {
+                        var InicioFila = "<tr>";
+                        var columna1 = "<td>" + _cuentas[i]["CuentaOrigen"] + "</td>";
+                        var columna2 = "<td>" + _cuentas[i]["Alias"] + "</td>";
+                        var columna3 = "<td>" + _cuentas[i]["NombreTipoCuenta"] + "</td>";
+                        var columna4 = "<td>" + _cuentas[i]["EstadoCuenta"] + "</td>";
+                        var columna5 = "<td>" + _cuentas[i]["SaldoTotal"] + "</td>";
+                        var FinFila = "</tr>";
+
+                        $("#TablaCuentas").append(InicioFila + columna1 + columna2 + columna3 + columna4 + columna5 + FinFila);
+                    }
+                    $("#TablaCuentas").append(ContenidoCierra);
+                    $("#ModalInfoCuentas").modal();
+                }
+            }
+        })
+    }
+
+    //Consultar tarjetas
+    function ConsultarTarjetas() {
+        var _identificacion = document.getElementById("txtNumIdent").value;
+        var _tipoDocumento = document.getElementById("txtTipoDocumento").value;
+        var _objDatos = {};
+
+        _objDatos.NumeroDocumento = _identificacion;
+        _objDatos.TipoDocumento = _tipoDocumento;
+
+        var _actionURL = "/Disponibles/ConsultarTarjetas";
+
+        BloquearPagina();
+        $.post(_actionURL, _objDatos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+
+                    $("#tablaDatosTarjetas").empty();
+                    var _cuentas = JSON.parse(_resultado);
+
+                    var tbl = $("<table/>").attr("id", "TablaTarjetas");
+                    tbl.attr("class", "table");
+                    $("#tablaDatosTarjetas").append(tbl);
+
+                    //Se crean los encabezados de la tabla
+                    var EncabezadoAbre = '<thead> <tr>';
+                    var EncabezadoTarjeta = ' <th class="text-bold">' + "Tarjeta" + "</th>";
+                    var EncabezadoEstado = '<th class="text-bold">' + "Estado" + "</th>";
+                    var EncabezadoTipoTarjeta = '<th class="text-bold">' + "Tipo Tarjeta" + "</th>";
+                    var EncabezadoDesbloquearTarjeta = "<th class='text-bold'></th>";
+                    var EncabezadoCierra = '</tr></thead>';
+                    var ContenidoAbre = '<tbody>';
+                    var ContenidoCierra = ' </tbody>';
+
+                    $("#TablaTarjetas").append(EncabezadoAbre + EncabezadoTarjeta + EncabezadoEstado + EncabezadoTipoTarjeta + EncabezadoDesbloquearTarjeta + EncabezadoCierra + ContenidoAbre);
+
+                    for (var i = 0; i < _cuentas.length; i++) {
+                        var idTarjeta = '"' + _cuentas[i]["NumeroTarjeta"] + "~" + _cuentas[i]["AliasNumeroTarjeta"] + '"';
+                        var InicioFila = "<tr>";
+                        var columna1 = "<td>" + _cuentas[i]["NumeroTarjeta"] + "</td>";
+                        var columna2 = "<td>" + _cuentas[i]["Estado"] + "</td>";
+                        var columna3 = "<td>" + _cuentas[i]["TipoTarjeta"] + "</td>";
+                        var columna4 = "<td></td>";
+                        var FinFila = "</tr>";
+
+                        if (_cuentas[i]["TarjetaBloqueada"] == true) {
+                            var _URL = "/Disponibles/VerificarPermisoDesbloquear"; /// METODO TEMPORAL PARA DELIMITAR LAS OPCIONES DEL FORMULARIO
+                            $.post(_URL, "", function (_resultado) {
+                                if (_resultado == "true") {
+                                    columna4 = "<td>  <button type='button' id='btnCuenta' onclick='DesbloquearTarjeta(" + idTarjeta + ")' class='btn Gt-btn-verde btn-icon legitRipple' data-toggle='tooltip' data-placement='top' title='Desbloquear Tarjeta'><i class='icon-unlocked2'></i></button> </td>";
+                                    $("#TablaTarjetas").append(InicioFila + columna1 + columna2 + columna3 + columna4 + FinFila);
+                                } else {
+                                    columna4 = "<td>  <button type='button' disabled='disabled' id='btnCuenta' onclick='DesbloquearTarjeta(" + idTarjeta + ")' class='btn Gt-btn-verde btn-icon legitRipple' data-toggle='tooltip' data-placement='top' title='Desbloquear Tarjeta'><i class='icon-unlocked2'></i></button> </td>";
+                                    $("#TablaTarjetas").append(InicioFila + columna1 + columna2 + columna3 + columna4 + FinFila);
+                                }
+                            });
+                        } else {
+                            $("#TablaTarjetas").append(InicioFila + columna1 + columna2 + columna3 + columna4 + FinFila);
+                        }
+
+                        //if (_cuentas[i]["TarjetaBloqueada"] == true) {
+                        //    columna4 = "<td>  <button type='button' id='btnCuenta' onclick='DesbloquearTarjeta(" + idTarjeta + ")' class='btn Gt-btn-verde btn-icon legitRipple' data-toggle='tooltip' data-placement='top' title='Desbloquear Tarjeta'><i class='icon-unlocked2'></i></button> </td>";
+                        //    $("#TablaTarjetas").append(InicioFila + columna1 + columna2 + columna3 + columna4 + FinFila);
+                        //} else {
+                        //    $("#TablaTarjetas").append(InicioFila + columna1 + columna2 + columna3 + columna4 + FinFila);
+                        //}
+                    }
+                    $("#TablaTarjetas").append(ContenidoCierra);
+                    $("#ModalInfoTarjetas").modal();
+                }
+            }
+        })
+    }
+
+    //Consulta los canales
+    function ConsultarCanales() {
+        var _identificacion = document.getElementById("txtNumIdent").value;
+        var _tipoDocumento = document.getElementById("txtTipoDocumento").value;
+        var _objDatos = {};
+
+        _objDatos.NumeroDocumento = _identificacion;
+        _objDatos.TipoDocumento = _tipoDocumento;
+
+        var _actionURL = "/Disponibles/ConsultarCanales";
+
+        BloquearPagina();
+        $.post(_actionURL, _objDatos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+
+                    $("#tablaDatosCanales").empty();
+                    var _cuentas = JSON.parse(_resultado);
+
+                    var tbl = $("<table/>").attr("id", "TablaCanales");
+                    tbl.attr("class", "table");
+                    $("#tablaDatosCanales").append(tbl);
+
+                    //Se crean los encabezados de la tabla
+                    var EncabezadoAbre = '<thead> <tr>';
+                    var EncabezadoCuenta = ' <th class="text-bold">' + "Cuenta" + "</th>";
+                    var EncabezadoCanal = '<th class="text-bold">' + "Canal" + "</th>";
+                    var EncabezadoNumOperaciones = '<th class="text-bold">' + "Número Operaciones" + "</th>";
+                    var EncabezadoMontoMaximo = '<th class="text-bold">' + "Monto Máximo" + "</th>";
+                    var EncabezadoCierra = '</tr></thead>';
+
+                    var ContenidoAbre = '<tbody>';
+                    var ContenidoCierra = ' </tbody>';
+
+                    $("#TablaCanales").append(EncabezadoAbre + EncabezadoCuenta + EncabezadoCanal + EncabezadoNumOperaciones + EncabezadoMontoMaximo + EncabezadoCierra + ContenidoAbre);
+
+
+                    for (var i = 0; i < _cuentas.length; i++) {
+                        var InicioFila = "<tr>";
+                        var columna1 = "<td>" + _cuentas[i]["Cuenta"] + "</td>";
+                        var columna2 = "<td>" + _cuentas[i]["Canal"] + "</td>";
+                        var columna3 = "<td>" + _cuentas[i]["NumeroOperaciones"] + "</td>";
+                        var columna4 = "<td>" + _cuentas[i]["MontoMaximo"] + "</td>";
+                        var FinFila = "</tr>";
+
+                        $("#TablaCanales").append(InicioFila + columna1 + columna2 + columna3 + columna4 + FinFila);
+                    }
+
+                    $("#TablaCanales").append(ContenidoCierra);
+                    $("#ModalInfoCanales").modal();
+                }
+            }
+        })
+    }
+
+    //Consulta tarjetas vs cuentas
+    function ConsultarTarjetasCuentas() {
+        var _identificacion = document.getElementById("txtNumIdent").value;
+        var _tipoDocumento = document.getElementById("txtTipoDocumento").value;
+        var _objDatos = {};
+
+        _objDatos.NumeroDocumento = _identificacion;
+        _objDatos.TipoDocumento = _tipoDocumento;
+
+        var _actionURL = "/Disponibles/ConsultarTarjetasCuentas";
+
+        BloquearPagina();
+        $.post(_actionURL, _objDatos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    $("#tablaDatosTarjetasCuentas").empty();
+                    var _cuentas = JSON.parse(_resultado);
+
+                    var tbl = $("<table/>").attr("id", "TablaTarjetasCuentas");
+                    tbl.attr("class", "table");
+                    $("#tablaDatosTarjetasCuentas").append(tbl);
+
+                    //Se crean los encabezados de la tabla
+                    var EncabezadoAbre = '<thead> <tr>';
+                    var EncabezadoCuenta = ' <th class="text-bold">' + "Cuenta" + "</th>";
+                    var EncabezadoTarjeta = '<th class="text-bold">' + "Tarjeta" + "</th>";
+                    var EncabezadoTipoTarjeta = '<th class="text-bold">' + "Tipo Tarjetas" + "</th>";
+                    var EncabezadoCierra = '</tr></thead>';
+
+                    var ContenidoAbre = '<tbody>';
+                    var ContenidoCierra = ' </tbody>';
+
+                    $("#TablaTarjetasCuentas").append(EncabezadoAbre + EncabezadoCuenta + EncabezadoTarjeta + EncabezadoTipoTarjeta + EncabezadoCierra + ContenidoAbre);
+
+
+                    for (var i = 0; i < _cuentas.length; i++) {
+                        var InicioFila = "<tr>";
+                        var columna1 = "<td>" + _cuentas[i]["Cuenta"] + "</td>";
+                        var columna2 = "<td>" + _cuentas[i]["Tarjeta"] + "</td>";
+                        var columna3 = "<td>" + _cuentas[i]["TipoTarjeta"] + "</td>";
+                        var FinFila = "</tr>";
+
+                        $("#TablaTarjetasCuentas").append(InicioFila + columna1 + columna2 + columna3 + FinFila);
+                    }
+
+                    $("#TablaTarjetasCuentas").append(ContenidoCierra);
+                    $("#ModalInfoTarjetasCuentas").modal();
+                }
+            }
+        })
+    }
+
+
+    //Desbloquerar Tarjeta
+    function DesbloquearTarjeta(PDatos) {
+        _actionURL = "/Disponibles/DesbloquerarTarjeta";
+        _datos = {};
+        _datos.ObjTarjetas = {};
+        var _identificacion = document.getElementById("txtNumIdent").value;
+        var _tipoDocumento = document.getElementById("txtTipoDocumento").value;
+        var datosTarjeta = PDatos.split("~");
+        _datos.ObjTarjetas.NumeroTarjeta = datosTarjeta[0];
+        _datos.ObjTarjetas.AliasNumeroTarjeta = datosTarjeta[1];
+        _datos.NumeroDocumento = _identificacion;
+        _datos.TipoDocumento = _tipoDocumento;
+
+        BloquearPagina();
+        $.post(_actionURL, _datos, function _resultado() {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    document.getElementById("PanelDatos").style.visibility = 'hidden';
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    if (_resultado.toString().toLowerCase().includes("proceso exitoso")) {
+                        CerrarModal('ModalInfoTarjetas');
+                        MostrarPNotify("Correcto", "", "La cuenta se desbloqueó correctamente.");
+                    }
+                }
+            }
+        })
+    }
+
+    //Cierra la modal
+    function CerrarModal(ventana) {
+        $('#' + ventana).modal('toggle');
+    }
+</script>
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class=" icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <div class="col-xs-12 col-md-4 col-lg-3">
+                    <label>Número de identificación:</label><span class="text-danger"> *</span>
+                </div>
+                <div class="col-xs-12 col-md-4 col-lg-3">
+                    <input type="text" class="form-control" id="txtIdentificacion" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12 col-mmd-12 col-lg-12 text-right">
+                <input type="submit" id="btnConsultar" class="btn Gt-btn-verde" value="Consultar" onclick="Consultar()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelDatos">
+    <div class="panel-body ">
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Número de identificación:</label>
+                <input type="text" enabled="false" class="form-control" id="txtNumIdent" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Tipo de documento:</label>
+                <input type="text" enabled="false" class="form-control" id="txtTipoDoc" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Fecha de expedición:</label>
+                <input type="text" enabled="false" class="form-control" id="txtFechaExped" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" enabled="false" class="form-control" id="txtNombre" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Fecha de Nacimiento:</label>
+                <input type="text" enabled="false" class="form-control" id="txtFechaNacimiento" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" enabled="false" class="form-control" id="txtDireccion" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <input type="text" enabled="false" class="form-control" id="txtTelefono" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Celular:</label>
+                <input type="text" enabled="false" class="form-control" id="txtCelular" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="text" enabled="false" class="form-control" id="txtEmail" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="chkEnvioSMS" class="styled" disabled="disabled">
+                        Envio SMS
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="chkValidacionOTP" class="styled" disabled="disabled">
+                        Validación OTP
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6">
+            <div class="form-group">
+                <input type="text" class="form-control" id="txtTipoDocumento" readonly="readonly" style="visibility:hidden" />
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12 text-center">
+                <input type="submit" id="btnConsultarCuentas" class="btn Gt-btn-morado" value="Cuentas" onclick="ConsultarCuentas()" />
+                <input type="submit" id="btnConsultarTarjetas" class="btn Gt-btn-morado" value="Tarjetas" onclick="ConsultarTarjetas()" />
+                <input type="submit" id="btnConsultar" class="btn Gt-btn-morado" value="Tarjetas VS Cuentas" onclick="ConsultarTarjetasCuentas()" />
+                <input type="submit" id="btnConsultarCanales" class="btn Gt-btn-morado" value="Canales" onclick="ConsultarCanales()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->
+<!-- Modal Información Cuentas -->
+<div id="ModalInfoCuentas" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title">Cuentas</h6>
+            </div>
+            <div class="modal-body">
+                <div id="tablaDatosCuentas" class="table-responsive pre-scrollable">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Información Cuentas -->
+<!-- Modal Información Tarjetas -->
+<div id="ModalInfoTarjetas" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title">Tarjetas</h6>
+            </div>
+            <div class="modal-body">
+                <div id="tablaDatosTarjetas" class="table-responsive pre-scrollable">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Información Cuentas -->
+<!-- Modal Información Tarjetas vs Cuentas -->
+<div id="ModalInfoTarjetasCuentas" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title">Tarjetas vs Cuentas</h6>
+            </div>
+            <div class="modal-body">
+                <div id="tablaDatosTarjetasCuentas" class="table-responsive pre-scrollable">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Información Tarjetas vs Cuentas -->
+<!-- Modal Información Canales -->
+<div id="ModalInfoCanales" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title">Canales</h6>
+            </div>
+            <div class="modal-body">
+                <div id="tablaDatosCanales" class="table-responsive pre-scrollable">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Información Canales -->

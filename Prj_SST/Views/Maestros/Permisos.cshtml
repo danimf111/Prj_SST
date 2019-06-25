@@ -1,0 +1,446 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    window.onload = function () {
+        document.getElementById("btnAgregar").disabled = true;
+        document.getElementById("btnEliminar").disabled = true;
+        document.getElementById("PanelDatos").style.visibility = 'hidden';
+        ObtenerPerfiles();
+    };
+
+    //obtiene los perfiles
+    //obtiene perfiles activos para asignar los permisos
+    function ObtenerPerfiles() {
+        var _actionURL = "/Maestros/ObtenerPerfilesActivos";
+
+        $.post(_actionURL, "", function (_resultado) {
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _perfil = JSON.parse(_resultado);
+                    var slPerfil = $("#slPerfil");
+
+                    for (var i = 0; i < _perfil.length; i++) {
+                        slPerfil.append($("<option></option>").val(_perfil[i]["IdPerfil"]).html(_perfil[i]["Nombre"]));
+                    }
+                }
+            }
+        });
+    }
+
+    //selecciona el perifil
+    //traer a pantalla lo  permisos denegados y permitidos que pertenesen al perfil
+    function SeleccionarPerfil() {
+
+        var _slPerfil = document.getElementById("slPerfil");
+        var _valorSeleccionado = _slPerfil.options[_slPerfil.selectedIndex].value;
+        var _objDatos = {};
+
+        if (_slPerfil == 0)
+            MostrarPNotify("Error", "", "Debe debe seleccionar Perfil");
+        else {
+            _objDatos.IdPerfil = _valorSeleccionado;
+
+            ObtenerPermitidos(_objDatos);
+            ObtenerDenegados(_objDatos);
+        }
+    }
+
+    //obtener permitidos
+    //btiene los permisos permitidos que le corresponde al perfil
+    //Datos la infomacion  que toma del pefil
+    function ObtenerPermitidos(Datos) {
+        var _actionURL = "/Maestros/ObtenerPermitidos"
+
+        BloquearPagina();
+        $.post(_actionURL, Datos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                }
+                else {
+                    LlenarTablaPermitidos(_resultado);
+                }
+            }
+        }
+    );
+    }
+
+    //obtener denegados
+    //btiene los permisos denegados que le corresponde al perfil
+    //Datos la infomacion  que toma del pefil
+    function ObtenerDenegados(Datos) {
+        var _actionURL = "/Maestros/ObtenerDenegados"
+
+        BloquearPagina();
+        $.post(_actionURL, Datos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                }
+                else {
+                    document.getElementById("PanelDatos").style.visibility = 'visible';
+                    LlenarTablaDenegados(_resultado);
+                }
+            }
+        }
+    );
+    }
+
+    //llena la tabla con los permisos permitidos
+    //toma los datos obtenidos y los muestra en la tabla
+    //Datos consultados en el  obtener para llenar
+    function LlenarTablaPermitidos(Datos) {
+        $("#tablaDatosPermitidos").empty();
+        $("#TablaPermitidos").empty();
+        var _permisos = JSON.parse(Datos);
+
+        var tbl = $("<table/>").attr("id", "TablaPermitidos");
+        tbl.attr("class", "table table-fixed");
+        $("#tablaDatosPermitidos").append(tbl);
+
+        var Inicio = "<thead>"
+        var InicioFila = "<tr>"
+        var titulo = "<th class='text-bold'>Permitidos</th>"
+        var FinFila = "</tr>"
+        var Fin = "</thead>"
+
+        $("#TablaPermitidos").append(Inicio + InicioFila + titulo + FinFila + Fin);
+
+        var ContenidoAbre = '<tbody>';
+        var ContenidoCierra = ' </tbody>';
+
+        $("#TablaPermitidos").append(ContenidoAbre);
+        for (var i = 0; i < _permisos.length; i++) {
+            var InicioFila = "<tr onclick='SeleccionarPermitidos(this," + _permisos[i]['IdModulo'] + " )'>";
+            var columna1 = "<td>" + _permisos[i]["Nombre"] + "</td>";
+            var FinFila = "</tr>";
+
+            $("#TablaPermitidos").append(InicioFila + columna1 + FinFila);
+        }
+        $("#TablaPermitidos").append(ContenidoCierra);
+    }
+
+    //llena la tabla con los permisos denegados
+    //toma los datos obtenidos y los muestra en la tabla
+    //Datos consultados en el  obtener para llenar
+    function LlenarTablaDenegados(Datos) {
+        $("#tablaDatosDenegados").empty();
+        $("#TablaDenegados").empty();
+        var _permisos = JSON.parse(Datos);
+
+        var tbl = $("<table/>").attr("id", "TablaDenegados");
+        tbl.attr("class", "table table-fixed");
+        $("#tablaDatosDenegados").append(tbl);
+
+        var Inicio = "<thead>"
+        var InicioFila = "<tr>"
+        var titulo = "<th class='text-bold'>Denegados</th>"
+        var FinFila = "</tr>"
+        var Fin = "</thead>"
+
+        $("#TablaDenegados").append(Inicio + InicioFila + titulo + FinFila + Fin);
+
+        var ContenidoAbre = '<tbody>';
+        var ContenidoCierra = ' </tbody>';
+
+        $("#TablaDenegados").append(ContenidoAbre);
+        for (var i = 0; i < _permisos.length; i++) {
+            var InicioFila = "<tr ondblclick='SeleccionarDenegados(this," + _permisos[i]['IdModulo'] + " )'>";
+            var columna1 = "<td>" + _permisos[i]["Nombre"] + "</td>";
+            var FinFila = "</tr>";
+
+            $("#TablaDenegados").append(InicioFila + columna1 + FinFila);
+        }
+        $("#TablaDenegados").append(ContenidoCierra);
+    }
+
+    //seleleccion de denegados
+    //selecciona el permiso de negado para agregar
+    //element infomacion del txt html, id del dato seleccionado
+    function SeleccionarDenegados(element, id) {
+
+        document.getElementById("btnAgregar").disabled = false;
+        document.getElementById("btnEliminar").disabled = true;
+
+        var _permisoSeleccionado = element.rowIndex;
+        var _tabla = document.getElementById('TablaDenegados');
+        var _celdas = _tabla.rows.item(_permisoSeleccionado).cells;
+        var _celdasLength = _celdas.length;
+
+        for (var contador = 0; contador < _celdasLength; contador++) {
+            var _valorCelda = _celdas.item(contador).innerHTML;
+            if (contador == 0) {
+                document.getElementById("txtIdDenegados").value = id;
+                document.getElementById("txtIdPermitidos").value = 0;
+            }
+        }
+    }
+
+    //agrega denegados
+    //tomar los datos seleccionados en denegados y los agrega
+    function AgregarDenegados() {
+
+        var _perfil = document.getElementById("slPerfil").value;
+        var _permisoSeleccionado = document.getElementById("txtIdDenegados").value;
+        var _Datos = {};
+
+        if (_permisoSeleccionado == 0)
+            MostrarPNotify("Error", "", "Debe seleccionar Permiso");
+        else {
+            _Datos.IdModulo = _permisoSeleccionado;
+            _Datos.IdPerfil = _perfil;
+
+            var _actionURL = "/Maestros/AgregarDenegados";
+            BloquearPagina();
+            $.post(_actionURL, _Datos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        document.getElementById("PanelDatos").style.visibility = 'hidden';
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    }
+                    else {
+                        MostrarPNotify("Correcto", "", "El registro se ha agregado exitosamente");
+                        document.getElementById("txtIdDenegados").value = "";
+                        document.getElementById("txtIdPermitidos").value = "";
+                        //document.getElementById("slPerfil").value = "";
+                        document.getElementById("btnAgregar").disabled = true;
+                        ObtenerPermitidos(_Datos);
+                        ObtenerDenegados(_Datos);
+                    }
+                }
+            });
+        }
+    }
+
+    //seleleccion de permitos
+    //selecciona el permiso de negado para agregar
+    //element infomacion del txt html, id del dato seleccionado
+    function SeleccionarPermitidos(element, id) {
+
+        document.getElementById("btnAgregar").disabled = true;
+        document.getElementById("btnEliminar").disabled = false;
+
+
+        var _permisoSeleccionado = element.rowIndex;
+        var _tabla = document.getElementById('TablaPermitidos');
+        var _celdas = _tabla.rows.item(_permisoSeleccionado).cells;
+        var _celdasLength = _celdas.length;
+
+        for (var contador = 0; contador < _celdasLength; contador++) {
+            var _valorCelda = _celdas.item(contador).innerHTML;
+            if (contador == 0) {
+                document.getElementById("txtIdPermitidos").value = id;
+                document.getElementById("txtIdDenegados").value = 0;
+            }
+        }
+    }
+
+    //elimina permitodos
+    //toma los datos seleccionados en permitidos
+    function EliminarPermitidos() {
+        var _perfil = document.getElementById("slPerfil").value;
+        var _permisoSeleccionado = document.getElementById("txtIdPermitidos").value;
+        var _Datos = {};
+
+        if (_permisoSeleccionado == 0)
+            MostrarPNotify("Error", "", "Debe seleccionar Permiso");
+
+        else {
+            _Datos.IdModulo = _permisoSeleccionado;
+            _Datos.IdPerfil = _perfil;
+
+            var _actionURL = "/Maestros/EliminarPermitidos";
+            MostrarPNotifyEliminar(_actionURL, _Datos);
+        }
+    }
+
+    //mostrar mensaje seguro eliminar
+    //trae un mensaje  a pantalla de pregunta si desea eliminar
+    //PactionUrl la alerta y PDatos que se traen para eliminar
+    function MostrarPNotifyEliminar(PactionURL, PDatos) {
+        BloquearPagina();
+        var opts = new PNotify({
+            title: "¿Desea eliminar este registro?",
+            text: "",
+            hide: false,
+            confirm: {
+                confirm: true,
+                buttons: [
+                    {
+                        text: 'Si',
+                        addClass: 'btn btn-sm Gt-btn-morado'
+
+                    },
+                    {
+                        text: 'No',
+                        addClass: 'btn btn-sm Gt-btn-verde '
+                    }
+                ]
+            },
+            buttons: {
+                closer: false,
+                sticker: false
+            },
+            history: {
+                history: false
+            }
+        })
+
+        opts.get().on('pnotify.confirm', function () {
+            $.post(PactionURL, PDatos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        document.getElementById("PanelDatos").style.visibility = 'hidden';
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        MostrarPNotify("Correcto", "", "El registro se ha eliminado exitosamente");
+                        document.getElementById("txtIdPermitidos").value = "";
+                        document.getElementById("txtIdDenegados").value = "";
+                        //document.getElementById("slPerfil").value = "";
+                        document.getElementById("btnEliminar").disabled = true;
+                        ObtenerPermitidos(PDatos);
+                        ObtenerDenegados(PDatos);
+                    }
+                }
+            });
+        })
+
+        //El usuario presiono el boton no
+        opts.get().on('pnotify.cancel', function () {
+            DesbloquearPagina();
+        });
+    };
+</script>
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Datos</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-toggle="modal" data-target="#ModalAyuda"><i class="icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a>
+                </li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="row">
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Perfil:</label>
+                        <span class="text-danger"> *</span>
+                        <select onchange="SeleccionarPerfil()" name="select" class="form-control" id="slPerfil">
+                            <option selected="selected" value="0">-- Seleccione --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+    </div>
+</div>
+
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelDatos">
+    <div class="panel-body ">
+
+        <div class="row">
+            <div class="col-xs-6 col-md-4">
+                <div class="table-responsive scrollTabla">
+                    <table id="TablaDenegados" class="table table-hover tablaBorder table-fixed"></table>
+                </div>
+                <label style="visibility:hidden">IdDenegados:</label>
+                <input type="text" class="form-control" style="visibility:hidden" id="txtIdDenegados" />
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <input type="submit" id="btnAgregar" class="btn Gt-btn-verde" value="Agregar" onclick="AgregarDenegados()" />
+            </div>
+
+            <div class="col-xs-6 col-md-4">
+                <div class="table-responsive scrollTabla">
+                    <table id="TablaPermitidos" class="table table-hover tablaBorder table-fixed"></table>
+                </div>
+                <label style="visibility:hidden">IdPermistidos:</label>
+                <input type="text" class="form-control" style="visibility:hidden" id="txtIdPermitidos" />
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <input type="submit" id="btnEliminar" class="btn Gt-btn-morado" value="Eliminar" onclick="EliminarPermitidos()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                    <li>Seleccione  un perfil  para habilitar los permisos </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->

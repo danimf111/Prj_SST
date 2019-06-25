@@ -1,0 +1,367 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+    window.onload = function () {
+        document.getElementById("PanelDatos").style.visibility = 'hidden';
+        document.getElementById("txtTarjeta").disabled = true;
+    }
+    //Obtiene las cuentas asociadas al numero de documento
+    function ObtenerCuentas() {
+        var _actionURL = "/Utilidades/ObtenerCuentas";
+        var _objDatos = {};
+        _objDatos.PsrtNumeroDocumento = document.getElementById("txtIdentificacion").value;
+        Limpiar();
+        if (_objDatos.PsrtNumeroDocumento.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar el número de identificación");
+        } else {
+            BloquearPagina();
+            $.post(_actionURL, _objDatos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        var _Cuentas = JSON.parse(_resultado);
+                        if (_Cuentas.length > 0) {
+                            var slCuentas = $("#slCuentas");
+                            document.getElementById("PanelDatos").style.visibility = 'visible';
+                            for (var i = 0; i < _Cuentas.length; i++) {
+                                slCuentas.append($("<option></option>").val(_Cuentas[i]["NumeroCuenta"]).html(_Cuentas[i]["NumeroCuenta"]));
+                            }
+                        } else {
+                            MostrarPNotify("Error", "", "No se encontro información asociada a el número de identificación: " + _objDatos.PsrtNumeroDocumento);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // obiene las tarjetas asociadas a un numero de cuenta
+    function ObtenerTarjetas() {
+        LimpiarCampoSeleccionable("slTipoNotificacion");
+        var _actionURL = "/Utilidades/ObtenerTarjetas";
+        var _objDatos = {};
+        _objDatos.PsrtCuenta = document.getElementById("slCuentas").value;
+        BloquearPagina();
+        $.post(_actionURL, _objDatos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _Tarjeta = JSON.parse(_resultado);
+                    if (_Tarjeta != null) {
+                        document.getElementById("txtTarjeta").value = _Tarjeta.NumeroTarjeta;
+                        ObtenerTiposNotificacion(true);
+                    } else {
+                        document.getElementById("txtTarjeta").value = "";
+                        ObtenerTiposNotificacion(false);
+                    }
+
+                }
+            }
+        });
+    }
+
+    //Obtiene los tipo de notificacion
+    function ObtenerTiposNotificacion(PExisteTarjeta) {
+        var _actionURL = "/Utilidades/ObtenerTiposNotificacion";
+        BloquearPagina();
+        $.post(_actionURL, "", function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _DescripcionTipoNotificacion = "";
+                    var _TipoNotificacion = JSON.parse(_resultado);
+                    var slTipoNotificacion = $("#slTipoNotificacion");
+                    if (PExisteTarjeta == true) {
+                        for (var i = 0; i < _TipoNotificacion.length; i++) {
+                            _DescripcionTipoNotificacion = _TipoNotificacion[i]["Valor"] + " - " + _TipoNotificacion[i]["Descripcion"];
+                            slTipoNotificacion.append($("<option></option>").val(_TipoNotificacion[i]["Valor"]).html(_DescripcionTipoNotificacion));
+                        }
+                    } else {
+                        for (var i = 0; i < _TipoNotificacion.length; i++) {
+                            _DescripcionTipoNotificacion = _TipoNotificacion[i]["Valor"] + " - " + _TipoNotificacion[i]["Descripcion"];
+                            if (_TipoNotificacion[i]["Valor"] != 5 && _TipoNotificacion[i]["Valor"] != 6 && _TipoNotificacion[i]["Valor"] != 7) {
+                                slTipoNotificacion.append($("<option></option>").val(_TipoNotificacion[i]["Valor"]).html(_DescripcionTipoNotificacion));
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    //Obtiene los estados
+    function ObtenerEstados() {
+        LimpiarCampoSeleccionable("slEstado");
+        var _actionURL = "";
+        var _tipoNotificacion = document.getElementById("slTipoNotificacion").value;
+        if (_tipoNotificacion != "0") {
+            if (_tipoNotificacion == 5 || _tipoNotificacion == 6 || _tipoNotificacion == 7) {
+                _actionURL = "/Utilidades/ObtenerEstadosTarjetas";
+            } else {
+                _actionURL = "/Utilidades/ObtenerEstadosCuentas";
+            }
+
+            BloquearPagina();
+            $.post(_actionURL, "", function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        var _DescripcionEstado = "";
+                        var _Estado = JSON.parse(_resultado);
+                        var slEstado = $("#slEstado");
+                        for (var i = 0; i < _Estado.length; i++) {
+                            _DescripcionEstado = _Estado[i]["Valor"] + " - " + _Estado[i]["Descripcion"];
+                            slEstado.append($("<option></option>").val(_Estado[i]["Valor"]).html(_DescripcionEstado));
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /// Elimina los daros de un campo seleccionable
+    function LimpiarCampoSeleccionable(PIdCampo) {
+        var _slCampo = $("#" + PIdCampo + " option");
+        for (var i = 0; i < _slCampo.length; i++) {
+            if (_slCampo[i].value != "0") {
+                $("#" + PIdCampo + " option[value='" + _slCampo[i].value + "']").remove();
+            }
+        }
+    }
+
+    // Limpia el formulario
+    function Limpiar() {
+        document.getElementById("txtTarjeta").value = "";
+        LimpiarCampoSeleccionable("slCuentas");
+        LimpiarCampoSeleccionable("slEstado");
+        LimpiarCampoSeleccionable("slTipoNotificacion");
+        document.getElementById("slActualizaSaldo").value = 0;
+    }
+
+    //Limpia todo el formulario
+    function LimpiarTodo() {
+        document.getElementById("txtIdentificacion").value = "";
+        document.getElementById("txtTarjeta").value = "";
+        LimpiarCampoSeleccionable("slCuentas");
+        LimpiarCampoSeleccionable("slEstado");
+        LimpiarCampoSeleccionable("slTipoNotificacion");
+        document.getElementById("slActualizaSaldo").value = 0;
+        document.getElementById("PanelDatos").style.visibility = 'hidden';
+    }
+
+    ///Crea la notificacion
+    function CrearNotificacion() {
+        var _objDatos = {};
+        _objDatos.NumeroIdentificacion = document.getElementById("txtIdentificacion").value;
+        _objDatos.NumeroCuenta = document.getElementById("slCuentas").value;
+        _objDatos.NumeroTarjeta = document.getElementById("txtTarjeta").value;
+        _objDatos.TipoNotificacion = document.getElementById("slTipoNotificacion").value;
+        _objDatos.Estado = document.getElementById("slEstado").value;
+        if (document.getElementById("slActualizaSaldo").value == "Si") {
+            _objDatos.ActualizaSaldo = "1";
+        } else if (document.getElementById("slActualizaSaldo").value == "No") {
+            _objDatos.ActualizaSaldo = "0";
+        }
+
+        if (_objDatos.NumeroIdentificacion.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar el número de identificación");
+        } else if (_objDatos.NumeroCuenta.trim() == "" || _objDatos.NumeroCuenta == "0") {
+            MostrarPNotify("Error", "", "Debe ingresar el número de cuenta");
+        } else if (_objDatos.TipoNotificacion.trim() == "" || _objDatos.TipoNotificacion == "0") {
+            MostrarPNotify("Error", "", "Debe ingresar el tipo de notificación");
+        } else if (_objDatos.Estado.trim() == "" || _objDatos.Estado == "0") {
+            MostrarPNotify("Error", "", "Debe ingresar el estado");
+        } else if (document.getElementById("slActualizaSaldo").value == "" || document.getElementById("slActualizaSaldo").value == "0") {
+            MostrarPNotify("Error", "", "Debe ingresar si actualiza saldo");
+        } else {
+            var _actionURL = "/Utilidades/CrearNotificacion";
+            BloquearPagina();
+            $.post(_actionURL, _objDatos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        var _Respuesta = JSON.parse(_resultado);
+                        if (_Respuesta.Mensaje == "notificacion creada correctamente") {
+                            MostrarPNotify("Correcto", "", "Notificación creada correctamente.");
+                            document.getElementById("PanelDatos").style.visibility = 'hidden';
+                            LimpiarTodo();
+                        } else {
+                            MostrarPNotify("Error", "", "No se pudo crear la notificación");
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+</script>
+
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class=" icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <div class="col-xs-12 col-md-4 col-lg-2">
+                    <label>Número de identificación:</label><span class="text-danger"> *</span>
+                </div>
+                <div class="col-xs-12 col-md-4 col-lg-3">
+                    <input type="text" class="form-control" id="txtIdentificacion" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12 col-mmd-12 col-lg-12 text-right">
+                <input type="submit" id="btnLimpiar" class=" btn Gt-btn-morado" value="Limpiar" onclick="LimpiarTodo()" />
+                <input type="submit" id="btnConsultar" class="btn Gt-btn-verde" value="Consultar" onclick="ObtenerCuentas()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelDatos">
+    <div class="panel-body">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="row">
+
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Cuenta:</label><span class="text-danger"> *</span>
+                        <select name="select" onchange="ObtenerTarjetas()" class="form-control" id="slCuentas"><option selected="selected" value="0">-- Seleccione --</option></select>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Tarjeta:</label>
+                        <input type="text" class="form-control" id="txtTarjeta" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Tipo de notificación:</label><span class="text-danger"> *</span>
+                        <select name="select" onchange="ObtenerEstados()" class="form-control" id="slTipoNotificacion"><option selected="selected" value="0">-- Seleccione --</option></select>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Estado:</label><span class="text-danger"> *</span>
+                        <select name="select" class="form-control" id="slEstado"><option selected="selected" value="0">-- Seleccione --</option></select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Actualiza saldo:</label><span class="text-danger"> *</span>
+                        <select name="select" class="form-control" id="slActualizaSaldo">
+                            <option selected="selected" value="0">-- Seleccione --</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12 text-right">
+
+                <input type="submit" id="btnConsultar" class="btn Gt-btn-verde" value="Crear" onclick="CrearNotificacion()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->

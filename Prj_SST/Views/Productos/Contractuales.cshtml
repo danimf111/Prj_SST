@@ -1,0 +1,821 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class=" icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio Operación -->
+                <label class="col-xs-12 col-md-3 col-lg-1">Operación:</label>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <select name="select" class="form-control" id="slOperacion">
+                        <option selected="selected" value="0">-- Seleccione --</option>
+                        <option value="0">Opción 1</option>
+                        <option value="0">Opción 2</option>
+                        <option value="0">Opción 3</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Fin Operación -->
+        </div>
+
+        <div class="col-md-12  col-sm-12 col-lg-12" id="PanelDatos">
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio Cuenta -->
+                <label class="col-xs-12 col-md-3 col-lg-1">Cuenta:</label>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <input type="text" id="txtCuenta" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnCuenta" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Cuenta -->
+                <!-- Inicio Oficina -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Oficina:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdOficina" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtOficina" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnOficina" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Oficina -->
+            </div>
+            <br /><br />
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+
+                <!-- Inicio OficinaAsociado -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Oficina asociado:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdOficinaAsociado" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtOficinaAsociado" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnOficinaAsociado" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin OficinaAsociado -->
+                <!-- Inicio Asociado -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Asociado:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdAsociado" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtAsociado" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnAsociado" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Asociado -->
+
+            </div>
+            <br /><br />
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio Producto -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Producto:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdProducto" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtProducto" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnProducto" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Producto -->
+                <!-- Inicio Asesor -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Asesor:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdAsesor" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtAsesor" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnAsesor" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Asesor -->
+
+            </div>
+            <br /><br />
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio EstadoCuenta -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Estado cuenta:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <input type="text" id="txtEstadoCuenta" class="form-control">
+                </div>
+                <!-- Fin EstadoCuenta -->
+
+                <div class="col-xs-2 col-md-1 col-lg-1">
+                </div>
+
+                <!-- Inicio OperacionPermitida -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Operación permitida:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <input type="text" id="txtEstadoCuenta" class="form-control">
+                </div>
+                <!-- Fin OperacionPermitida -->
+            </div>
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+
+                <!-- Inicio Relacion -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Relación:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <select name="select" class="form-control" id="slRelacion">
+                        <option selected="selected" value="0">-- Seleccione --</option>
+                        <option value="0">Opción 1</option>
+                        <option value="0">Opción 2</option>
+                        <option value="0">Opción 3</option>
+                    </select>
+                </div>
+                <div class="col-xs-2 col-md-1 col-lg-1">
+                </div>
+                <!-- Fin Relacion -->
+                <!-- Inicio FormaPago -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Forma pago:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <select name="select" class="form-control" id="slFormaPago">
+                        <option selected="selected" value="0">-- Seleccione --</option>
+                        <option value="0">Opción 1</option>
+                        <option value="0">Opción 2</option>
+                        <option value="0">Opción 3</option>
+                    </select>
+                </div>  <!-- Fin FormaPago -->
+            </div>
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+
+                <!-- Inicio NroSorteo -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label class="text-bold">Nro. Sorteo:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-1">
+                    <input type="text" id="txtNroSorteo" class="form-control">
+                </div>
+                <!-- Fin NroSorteo -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelTab">
+    <div class="panel-body">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="tabbable">
+                <ul class="nav nav-tabs nav-tabs-bottom colorBottomTab">
+                    <li class="active"><a href="#tab1" data-toggle="tab">Negociación</a></li>
+                    <li><a href="#tab2" data-toggle="tab">Saldos</a></li>
+                    <li><a href="#tab3" data-toggle="tab">Autorizados</a></li>
+                    <li><a href="#tab4" data-toggle="tab">Beneficiarios</a></li>
+                    <li><a href="#tab5" data-toggle="tab">Observación</a></li>
+                    <li><a href="#tab6" data-toggle="tab">Fechas</a></li>
+                    <li><a href="#tab7" data-toggle="tab">Historial</a></li>
+                </ul>
+                <div class="tab-content">
+                    @*<div class="col-xs-12 col-md-12 col-lg-12">*@
+                    <!-- Inicio tab1 -->
+                    <div class="tab-pane active" id="tab1">
+                        <br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Periodo -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Período:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <select name="select" class="form-control" id="slPeriodo ">
+                                    <option selected="selected" value="0">-- Seleccione --</option>
+                                    <option value="0">Opción 1</option>
+                                    <option value="1">Opción 2</option>
+                                </select>
+                            </div>
+                            <!-- Fin Periodo -->
+
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+
+                            <!-- Inicio Plazo -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Plazo:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtPlazo" class="form-control">
+                            </div>
+                            <!-- Fin Plazo-->
+
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio CuotaMes  -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Cuota mes:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtCuotaMes" class="form-control">
+                            </div>
+                            <!-- Fin CuotaMes  -->
+
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio ValorTotalPlan -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Valor total plan:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtValorTotalPlan" class="form-control">
+                            </div>
+                            <!-- Fin ValorTotalPlan -->
+                        </div>
+
+                        <br /><br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Liquidacion -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Liquidación:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtLiquidacion" class="form-control">
+                            </div>
+                            <!-- Fin Liquidacion -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio CuentaAhorro -->
+                            <label class="col-xs-12 col-md-3 col-lg-1">Cuenta ahorro:</label>
+                            <div class="col-xs-10 col-md-8 col-lg-4">
+                                <input type="text" id="txtCuentaAhorro" class="form-control">
+                            </div>
+                            <div class="col-xs-1 col-md-1 col-lg-1">
+                                <button type="button" id="btnCuentaAhorro" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                            </div>
+                            <!-- Fin CuentaAhorro -->
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio TasaEfectiva  -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Tasa efectiva:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtTasaEfectiva" class="form-control">
+                            </div>
+                            <!-- Fin TasaEfectiva -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio TasaNominal   -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Tasa nominal:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtTasaNominal" class="form-control">
+                            </div>
+                            <!-- Fin TasaNominal -->
+
+
+
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Indicador  -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Indicador:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtIndicador" class="form-control">
+                            </div>
+                            <!-- Fin Indicador -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio Puntos   -->
+                            <div class="col-xs-12 col-md-4 col-lg-1">
+                                <label>Puntos:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtPuntos" class="form-control">
+                            </div>
+                            <!-- Fin Puntos -->
+                        </div>
+
+                    </div>
+                    <!-- Fin tab1 -->
+                    <!-- Inicio tab2 -->
+                    <div class="tab-pane" id="tab2">
+                        <br />
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio InteresCausado -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Interés causado:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtInteresCausado" class="form-control">
+                            </div>
+                            <!-- Fin InteresCausado -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <!-- Inicio RteFuente  -->
+                                <label>Retención en la fuente:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtRteFuente" class="form-control">
+                            </div>
+                            <!-- Fin RteFuente  -->
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+
+                            <!-- Inicio InteresPorPagar -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Interés por pagar:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtInteresPorPagar" class="form-control">
+                            </div>
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SaldoMinimo  -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Saldo mínimo:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoMinimo " class="form-control">
+                            </div>
+                            <!-- Fin SaldoMinimo  -->
+
+
+
+                        </div>
+
+                        <br /><br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio InteresLiquidado -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Interés liquidado:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtInteresLiquidado" class="form-control">
+                            </div>
+
+                            <!-- Fin InteresLiquidado -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+
+                            <!-- Inicio SaldoCanje -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Saldo canje:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoCanje" class="form-control">
+                            </div>
+                            <!-- Fin SaldoCanje -->
+
+
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio CapitalPagado -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Capital pagado:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtCapitalPagado" class="form-control">
+                            </div>
+                            <!-- Fin CapitalPagado -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SaldoEfectivo -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Saldo efectivo:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoEfectivo" class="form-control">
+                            </div>
+                            <!-- Fin SaldoEfectivo -->
+
+
+
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio valorSorteo -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Valor por sorteos:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtValorSorteo" class="form-control">
+                            </div>
+                            <!-- Fin valorSorteo -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio InteresPunto -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Valor interés por puntos:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtInteresPunto" class="form-control">
+                            </div>
+                            <!-- Fin InteresPunto -->
+
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio SaldoTotal -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Saldo total:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoTotal" class="form-control">
+                            </div>
+                            <!-- Fin SaldoTotal -->
+                        </div>
+                    </div>
+                    <!-- Fin tab2 -->
+                    <!-- Inicio tab3 -->
+                    <div class="tab-pane" id="tab3">
+                        <br />
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio DocumentoAutorizado -->
+                            <label class="col-xs-12 col-md-3 col-lg-1">Documento:</label>
+                            <div class="col-xs-10 col-md-8 col-lg-4">
+                                <input type="text" id="txtDocumentoAutorizado" class="form-control">
+                            </div>
+                            <div class="col-xs-1 col-md-1 col-lg-1">
+                                <button type="button" id="btnDocumentoAutorizado" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                            </div>
+                            <!-- Fin DocumentoAutorizado -->
+                            <!-- Inicio NombreAutorizado   -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Nombre:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-4">
+                                <input type="text" id="txtNombre" class="form-control">
+                            </div>
+                            <!-- Fin NombreAutorizado  -->
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12 text-right">
+                            <br />
+                            <input type="submit" id="btnAgregar" class="btn Gt-btn-verde" value="Agregar" />
+                            <input type="submit" id="btnEliminar" class="btn Gt-btn-morado" value="Eliminar" /><br />
+                        </div>
+
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <br />
+                            <div class="table-responsive scrollTabla">
+                                <table id="TablaAutorizados" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-bold">Documento</th>
+                                            <th class="text-bold">Nombre</th>
+                                            <th class="text-bold">Fecha Matrícula </th>
+                                            <th class="text-bold">Dato1</th>
+                                            <th class="text-bold">Dato2</th>
+                                            <th class="text-bold">Residencia</th>
+                                            <th class="text-bold">Tel trabajo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Fin tab3 -->
+                    <!-- Inicio tab4 -->
+                    <div class="tab-pane" id="tab4">
+                        <br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio DocumentoBeneficiario -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Documento:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtDocumentoBenef" class="form-control">
+                            </div>
+                            <!-- Fin DocumentoBeneficiario -->
+                            <div class="col-xs-12 col-md-1 col-lg-1"> </div>
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <!-- Inicio Parentesco  -->
+                                <label>Parentesco :</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <select name="select" class="form-control" id="slParentesco ">
+                                    <option selected="selected" value="0">-- Seleccione --</option>
+                                    <option value="0">Opción 1</option>
+                                    <option value="0">Opción 2</option>
+                                    <option value="0">Opción 3</option>
+                                </select>
+                            </div>
+                            <!-- Fin Parentesco  -->
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio PrimerApellido -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>1er apellido:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtPrimerApellido" class="form-control">
+                            </div>
+                            <!-- Fin PrimerApellido -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SegundoApellido -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>2do apellido:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSegundoApellido" class="form-control">
+                            </div>
+                            <!-- Fin SegundoApellido -->
+                        </div>
+
+                        <br /><br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio PrimerNombre -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>1er nombre:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtPrimerNombre" class="form-control">
+                            </div>
+                            <!-- Fin PrimerNombre -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SegundoNombre -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>2do nombre:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSegundoNombre" class="form-control">
+                            </div>
+                            <!-- Fin SegundoNombre -->
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Telefono  -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Teléfono:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-1">
+                                <input type="text" id="txtTelefono" class="form-control">
+                            </div>
+                            <!-- Fin Telefono -->
+                            <div class="col-xs-12 col-md-12 col-lg-3"> </div>
+                            <!-- Inicio Porcentaje   -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Porcentaje:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-1">
+                                <input type="text" id="txtPorcentaje" class="form-control">
+                            </div>
+                            <!-- Fin Porcentaje -->
+                        </div>
+                        <div class="row">
+                            <br />
+                            <div class="col-xs-12 col-md-12 col-lg-12 text-right">
+                                <input type="submit" id="btnAgregar" class="btn Gt-btn-verde" value="Agregar" />
+                                <input type="submit" id="btnEliminar" class="btn Gt-btn-morado" value="Eliminar" />
+                            </div><br />
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <br />
+                            <div class="table-responsive scrollTabla">
+                                <table id="TablaDatos" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-bold">Documento</th>
+                                            <th class="text-bold">Parentesco</th>
+                                            <th class="text-bold">Primer apellido</th>
+                                            <th class="text-bold">Segundo apellido</th>
+                                            <th class="text-bold">Primer nombre</th>
+                                            <th class="text-bold">Segundo nombre</th>
+                                            <th class="text-bold">Teléfono</th>
+                                            <th class="text-bold">Porcentaje</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                            <td>Dato 8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                            <td>Dato 8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                            <td>Dato 8</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Fin tab4 -->
+                    <!-- Inicio tab5 -->
+                    <div class="tab-pane" id="tab5">
+
+                        <br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Obervacion -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Obervación:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-4">
+                                <textarea rows="5" cols="10" class="form-control" id="txtObervacion"></textarea>
+                            </div>
+                            <!-- Fin Obervacion -->
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <br />
+                            <div class="table-responsive scrollTabla">
+                                <table id="TablaDatos" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-bold">Fecha</th>
+                                            <th class="text-bold">Obervación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Fin tab5 -->
+                    <!-- Inicio tab6 -->
+                    <div class="tab-pane" id="tab6">
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Apertura -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Apertura:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtApertura" class="form-control">
+                            </div>
+                            <!-- Fin Apertura -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio Vencimiento -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Vencimiento:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtVencimiento" class="form-control">
+                            </div>
+                            <!-- Fin Vencimiento  -->
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio UltimaTransac  -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Ultima transacción:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtUltimaTransac" class="form-control">
+                            </div>
+                            <!-- Fin UltimaTransac -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio Cancelacion -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Cancelación:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtCancelacion" class="form-control">
+                            </div>
+                            <!-- Fin Cancelacion  -->
+                        </div>
+
+
+                    </div>
+                    <!-- Fin tab6 -->
+                    <!-- Inicio tab7 -->
+                    <div class="tab-pane" id="tab7">
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <br />
+                            <div class="table-responsive scrollTabla">
+                                <table id="TablaDatosHistorial" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-bold">Fecha y hora</th>
+                                            <th class="text-bold">Descripción</th>
+                                            <th class="text-bold">Usuario responsable</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Fin tab7 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->

@@ -1,0 +1,297 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Lib_Objetos.oReportes
+
+<script>
+    //Evento que se ejecuta al abrir la pagina
+    window.onload = function () {
+        ObtenerCodigosInformacion();
+        ObtenerMotivosConsulta();
+        ObtenerTiposIdentificacion();
+        ObtenerDatosUsuario();
+        document.getElementById("PanelReporte").style.visibility = 'hidden';
+    };
+
+    //Obtiene los codigo de informacion
+    function ObtenerCodigosInformacion() {
+        var _actionURL = "/Productos/ObtenerCodigosInformacion";
+        BloquearPagina();
+        $.post(_actionURL, "", function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _codigosInformacion = JSON.parse(_resultado);
+                    var slCodigoInfo = $("#slCodigoInfo");
+                    for (var i = 0; i < _codigosInformacion.length; i++) {
+                        slCodigoInfo.append($("<option></option>").val(_codigosInformacion[i]["CodListProveedor"] + "~" + _codigosInformacion[i]["IdLista"]).html(_codigosInformacion[i]["Descripcion"]));
+                    }
+                }
+            }
+        });
+    }
+
+    //Obtiene los motivos de consulta
+    function ObtenerMotivosConsulta() {
+        var _actionURL = "/Productos/ObtenerMotivosConsulta";
+        BloquearPagina();
+        $.post(_actionURL, "", function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _motivosConsulta = JSON.parse(_resultado);
+                    var slMotivoConsulta = $("#slMotivoConsulta");
+                    for (var i = 0; i < _motivosConsulta.length; i++) {
+                        slMotivoConsulta.append($("<option></option>").val(_motivosConsulta[i]["CodListProveedor"] + "~" + _motivosConsulta[i]["IdLista"]).html(_motivosConsulta[i]["Valor"]));
+                    }
+                }
+            }
+        });
+    }
+
+    //obtiene los tipos de identificacion
+    function ObtenerTiposIdentificacion() {
+        var _actionURL = "/Productos/ObtenerTiposIdentificacion";
+        BloquearPagina();
+        $.post(_actionURL, "", function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _TipoIdenti = JSON.parse(_resultado);
+                    var slTipoIdenti = $("#slTipoIdenti");
+                    for (var i = 0; i < _TipoIdenti.length; i++) {
+                        slTipoIdenti.append($("<option></option>").val(_TipoIdenti[i]["CodListProveedor"] + "~" + _TipoIdenti[i]["IdLista"]).html(_TipoIdenti[i]["Descripcion"]));
+                    }
+                }
+            }
+        });
+    }
+
+    //Consulta el score
+    function Consultar() {
+        var _identificacion = document.getElementById("txtIdentificacion").value;
+        var _tipoIdenti = document.getElementById("slTipoIdenti").value;
+        var _codigoInfo = document.getElementById("slCodigoInfo").value;
+        var _motivoConsulta = document.getElementById("slMotivoConsulta").value;
+        var _origenDatos = document.getElementById("slOrigenDatos").value;
+        var _actionURL = "/Productos/ConsultarScore";
+        var _objDatos = {};
+
+        if (_identificacion.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar el número de identificación");
+        } else if (_tipoIdenti == null || _tipoIdenti.trim() == "" || _tipoIdenti == "0") {
+            MostrarPNotify("Error", "", "Debe seleccionar el tipo de identificación");
+        } else if (_codigoInfo == null || _codigoInfo.trim() == "" || _codigoInfo == "0") {
+            MostrarPNotify("Error", "", "Debe seleccionar el código información");
+        } else if (_motivoConsulta == null || _motivoConsulta.trim() == "" || _motivoConsulta == "0") {
+            MostrarPNotify("Error", "", "Debe seleccionar el motivo consulta");
+        } else if (_origenDatos == null || _origenDatos.trim() == "" || _origenDatos == "0") {
+            MostrarPNotify("Error", "", "Debe seleccionar el origen datos");
+        } else {
+
+            var _codTipoIdenti = _tipoIdenti.split('~');
+            var _codCodigoInfo = _codigoInfo.split('~');
+            var _codMotivoConsulta = _motivoConsulta.split('~');
+            var _codOrigenDatos = _origenDatos.split('~');
+
+            _objDatos.Identificacion = _identificacion;
+            _objDatos.TipoIdentificacion = _codTipoIdenti[0];
+            _objDatos.CodigoInformacion = _codCodigoInfo[0];
+            _objDatos.MotivoConsulta = _codMotivoConsulta[0];
+            _objDatos.OrigenDatos = _codOrigenDatos[0];
+
+            _objDatos.IdTipoIdentificacion = _codTipoIdenti[1];
+            _objDatos.IdCodigoInformacion = _codCodigoInfo[1];
+            _objDatos.IdMotivoConsulta = _codMotivoConsulta[1];
+            _objDatos.IdOrigenDatos = _codOrigenDatos[1];
+            BloquearPagina();
+            $.post(_actionURL, _objDatos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        LlenarDatos(_resultado);
+                    }
+                }
+            });
+        }
+    }
+
+    //Muestra el reporte
+    function LlenarDatos(PDatos) {
+        if (PDatos != null) {
+            var _Datos = JSON.parse(PDatos);
+            var _RutaVista = _Datos.RutaVista;
+            var _ventanaReporte = window.open(_RutaVista, '_blank', 'location=no,height=600,width=1200,scrollbars=yes,status=yes,menubar=yes, resizable=yes');
+        }
+    }
+
+    //Consulta la informacion el usuario
+    function ObtenerDatosUsuario() {
+        var _actionURL = "/Productos/ObtenerDatosUsuario";
+        BloquearPagina();
+        $.post(_actionURL, "", function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _objDatos = JSON.parse(_resultado);
+                    if (_objDatos.Autorizador == false) {
+                        document.getElementById("slOrigenDatos").disabled = true;
+                        document.getElementById("slOrigenDatos").value = "Automatico";
+                    } else {
+                        document.getElementById("slOrigenDatos").disabled = false;
+                        document.getElementById("slOrigenDatos").value = "0";
+                    }
+                }
+            }
+        });
+    }
+</script>
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class="icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="row">
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Identificación del asociado:</label><span class="text-danger"> *</span>
+                        <input type="text" class="form-control" id="txtIdentificacion" />
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Tipo de identificación:</label><span class="text-danger"> *</span>
+                        <select name="select" class="form-control" id="slTipoIdenti"><option selected="selected" value="0">-- Seleccione --</option></select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Código de información:</label><span class="text-danger"> *</span>
+                        <select name="select" class="form-control" id="slCodigoInfo"><option selected="selected" value="0">-- Seleccione --</option></select>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Motivo de consulta:</label><span class="text-danger"> *</span>
+                        <select name="select" class="form-control" id="slMotivoConsulta"><option selected="selected" value="0">-- Seleccione --</option></select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-4 col-lg-4">
+                    <div class="form-group">
+                        <label>Origen de datos:</label><span class="text-danger"> *</span>
+                        <select name="select" class="form-control" id="slOrigenDatos">
+                            <option selected="selected" value="0">-- Seleccione --</option>
+                            <option value="Automatico">Automático</option>
+                            <option value="CIFIN">CIFIN</option>
+                            <option value="Coogranada">Coogranada</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12 text-right">
+                <input type="submit" id="btnConsultar" class="btn Gt-btn-verde" value="Consultar" onclick="Consultar()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelReporte">
+    <div class="panel-body ">
+
+        <iframe id="frmReport" frameborder="0" scrolling="no"></iframe>
+
+    </div>
+</div>
+
+
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->

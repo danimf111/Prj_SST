@@ -1,0 +1,531 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="db_SSTModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="tbl_Estados">
+          <Key>
+            <PropertyRef Name="IdEstado" />
+          </Key>
+          <Property Name="IdEstado" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Descripcion" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="tbl_Modulos">
+          <Key>
+            <PropertyRef Name="IdModulo" />
+          </Key>
+          <Property Name="IdModulo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Descripcion" Type="varchar(max)" />
+          <Property Name="IdEstado" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Perfiles">
+          <Key>
+            <PropertyRef Name="IdPerfil" />
+          </Key>
+          <Property Name="IdPerfil" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Descripcion" Type="varchar(max)" />
+          <Property Name="IdEstado" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_PerfilesUsuarios">
+          <Key>
+            <PropertyRef Name="IdPerfilUsuario" />
+          </Key>
+          <Property Name="IdPerfilUsuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdPerfil" Type="int" Nullable="false" />
+          <Property Name="IdUsuario" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Permisos">
+          <Key>
+            <PropertyRef Name="IdPermiso" />
+          </Key>
+          <Property Name="IdPermiso" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdPerfil" Type="int" Nullable="false" />
+          <Property Name="IdModulo" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_TiposDocumentos">
+          <Key>
+            <PropertyRef Name="IdTipoDocumento" />
+          </Key>
+          <Property Name="IdTipoDocumento" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Descripcion" Type="varchar(max)" />
+          <Property Name="IdEstado" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Usuarios">
+          <Key>
+            <PropertyRef Name="IdUsuario" />
+          </Key>
+          <Property Name="IdUsuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Documento" Type="varchar" MaxLength="15" Nullable="false" />
+          <Property Name="IdTipoDocumento" Type="int" Nullable="false" />
+          <Property Name="Nombre" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="Usuario" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Clave" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="FechaNacimiento" Type="datetime" Nullable="false" />
+          <Property Name="IdEstado" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_tbl_Modulos_tbl_Estados">
+          <End Role="tbl_Estados" Type="Self.tbl_Estados" Multiplicity="1" />
+          <End Role="tbl_Modulos" Type="Self.tbl_Modulos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Estados">
+              <PropertyRef Name="IdEstado" />
+            </Principal>
+            <Dependent Role="tbl_Modulos">
+              <PropertyRef Name="IdEstado" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Perfiles_tbl_Estados">
+          <End Role="tbl_Estados" Type="Self.tbl_Estados" Multiplicity="1" />
+          <End Role="tbl_Perfiles" Type="Self.tbl_Perfiles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Estados">
+              <PropertyRef Name="IdEstado" />
+            </Principal>
+            <Dependent Role="tbl_Perfiles">
+              <PropertyRef Name="IdEstado" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_PerfilesUsuarios_tbl_Perfiles">
+          <End Role="tbl_Perfiles" Type="Self.tbl_Perfiles" Multiplicity="1" />
+          <End Role="tbl_PerfilesUsuarios" Type="Self.tbl_PerfilesUsuarios" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Perfiles">
+              <PropertyRef Name="IdPerfil" />
+            </Principal>
+            <Dependent Role="tbl_PerfilesUsuarios">
+              <PropertyRef Name="IdPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_PerfilesUsuarios_tbl_Usuarios">
+          <End Role="tbl_Usuarios" Type="Self.tbl_Usuarios" Multiplicity="1" />
+          <End Role="tbl_PerfilesUsuarios" Type="Self.tbl_PerfilesUsuarios" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Usuarios">
+              <PropertyRef Name="IdUsuario" />
+            </Principal>
+            <Dependent Role="tbl_PerfilesUsuarios">
+              <PropertyRef Name="IdPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Permisos_tbl_Modulos">
+          <End Role="tbl_Modulos" Type="Self.tbl_Modulos" Multiplicity="1" />
+          <End Role="tbl_Permisos" Type="Self.tbl_Permisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Modulos">
+              <PropertyRef Name="IdModulo" />
+            </Principal>
+            <Dependent Role="tbl_Permisos">
+              <PropertyRef Name="IdModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Permisos_tbl_Perfiles">
+          <End Role="tbl_Perfiles" Type="Self.tbl_Perfiles" Multiplicity="1" />
+          <End Role="tbl_Permisos" Type="Self.tbl_Permisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Perfiles">
+              <PropertyRef Name="IdPerfil" />
+            </Principal>
+            <Dependent Role="tbl_Permisos">
+              <PropertyRef Name="IdPerfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Usuarios_tbl_Estados">
+          <End Role="tbl_Estados" Type="Self.tbl_Estados" Multiplicity="1" />
+          <End Role="tbl_Usuarios" Type="Self.tbl_Usuarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Estados">
+              <PropertyRef Name="IdEstado" />
+            </Principal>
+            <Dependent Role="tbl_Usuarios">
+              <PropertyRef Name="IdEstado" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Usuarios_tbl_TiposDocumentos">
+          <End Role="tbl_TiposDocumentos" Type="Self.tbl_TiposDocumentos" Multiplicity="1" />
+          <End Role="tbl_Usuarios" Type="Self.tbl_Usuarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_TiposDocumentos">
+              <PropertyRef Name="IdTipoDocumento" />
+            </Principal>
+            <Dependent Role="tbl_Usuarios">
+              <PropertyRef Name="IdTipoDocumento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="db_SSTModelStoreContainer">
+          <EntitySet Name="tbl_Estados" EntityType="Self.tbl_Estados" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Modulos" EntityType="Self.tbl_Modulos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Perfiles" EntityType="Self.tbl_Perfiles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_PerfilesUsuarios" EntityType="Self.tbl_PerfilesUsuarios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Permisos" EntityType="Self.tbl_Permisos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_TiposDocumentos" EntityType="Self.tbl_TiposDocumentos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Usuarios" EntityType="Self.tbl_Usuarios" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_tbl_Modulos_tbl_Estados" Association="Self.FK_tbl_Modulos_tbl_Estados">
+            <End Role="tbl_Estados" EntitySet="tbl_Estados" />
+            <End Role="tbl_Modulos" EntitySet="tbl_Modulos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Perfiles_tbl_Estados" Association="Self.FK_tbl_Perfiles_tbl_Estados">
+            <End Role="tbl_Estados" EntitySet="tbl_Estados" />
+            <End Role="tbl_Perfiles" EntitySet="tbl_Perfiles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_PerfilesUsuarios_tbl_Perfiles" Association="Self.FK_tbl_PerfilesUsuarios_tbl_Perfiles">
+            <End Role="tbl_Perfiles" EntitySet="tbl_Perfiles" />
+            <End Role="tbl_PerfilesUsuarios" EntitySet="tbl_PerfilesUsuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_PerfilesUsuarios_tbl_Usuarios" Association="Self.FK_tbl_PerfilesUsuarios_tbl_Usuarios">
+            <End Role="tbl_Usuarios" EntitySet="tbl_Usuarios" />
+            <End Role="tbl_PerfilesUsuarios" EntitySet="tbl_PerfilesUsuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Permisos_tbl_Modulos" Association="Self.FK_tbl_Permisos_tbl_Modulos">
+            <End Role="tbl_Modulos" EntitySet="tbl_Modulos" />
+            <End Role="tbl_Permisos" EntitySet="tbl_Permisos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Permisos_tbl_Perfiles" Association="Self.FK_tbl_Permisos_tbl_Perfiles">
+            <End Role="tbl_Perfiles" EntitySet="tbl_Perfiles" />
+            <End Role="tbl_Permisos" EntitySet="tbl_Permisos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Usuarios_tbl_Estados" Association="Self.FK_tbl_Usuarios_tbl_Estados">
+            <End Role="tbl_Estados" EntitySet="tbl_Estados" />
+            <End Role="tbl_Usuarios" EntitySet="tbl_Usuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Usuarios_tbl_TiposDocumentos" Association="Self.FK_tbl_Usuarios_tbl_TiposDocumentos">
+            <End Role="tbl_TiposDocumentos" EntitySet="tbl_TiposDocumentos" />
+            <End Role="tbl_Usuarios" EntitySet="tbl_Usuarios" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="db_SSTModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="tbl_Estados">
+          <Key>
+            <PropertyRef Name="IdEstado" />
+          </Key>
+          <Property Name="IdEstado" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tbl_Modulos" Relationship="Self.FK_tbl_Modulos_tbl_Estados" FromRole="tbl_Estados" ToRole="tbl_Modulos" />
+          <NavigationProperty Name="tbl_Perfiles" Relationship="Self.FK_tbl_Perfiles_tbl_Estados" FromRole="tbl_Estados" ToRole="tbl_Perfiles" />
+          <NavigationProperty Name="tbl_Usuarios" Relationship="Self.FK_tbl_Usuarios_tbl_Estados" FromRole="tbl_Estados" ToRole="tbl_Usuarios" />
+        </EntityType>
+        <EntityType Name="tbl_Modulos">
+          <Key>
+            <PropertyRef Name="IdModulo" />
+          </Key>
+          <Property Name="IdModulo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IdEstado" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tbl_Estados" Relationship="Self.FK_tbl_Modulos_tbl_Estados" FromRole="tbl_Modulos" ToRole="tbl_Estados" />
+          <NavigationProperty Name="tbl_Permisos" Relationship="Self.FK_tbl_Permisos_tbl_Modulos" FromRole="tbl_Modulos" ToRole="tbl_Permisos" />
+        </EntityType>
+        <EntityType Name="tbl_Perfiles">
+          <Key>
+            <PropertyRef Name="IdPerfil" />
+          </Key>
+          <Property Name="IdPerfil" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IdEstado" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tbl_Estados" Relationship="Self.FK_tbl_Perfiles_tbl_Estados" FromRole="tbl_Perfiles" ToRole="tbl_Estados" />
+          <NavigationProperty Name="tbl_PerfilesUsuarios" Relationship="Self.FK_tbl_PerfilesUsuarios_tbl_Perfiles" FromRole="tbl_Perfiles" ToRole="tbl_PerfilesUsuarios" />
+          <NavigationProperty Name="tbl_Permisos" Relationship="Self.FK_tbl_Permisos_tbl_Perfiles" FromRole="tbl_Perfiles" ToRole="tbl_Permisos" />
+        </EntityType>
+        <EntityType Name="tbl_PerfilesUsuarios">
+          <Key>
+            <PropertyRef Name="IdPerfilUsuario" />
+          </Key>
+          <Property Name="IdPerfilUsuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdPerfil" Type="Int32" Nullable="false" />
+          <Property Name="IdUsuario" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tbl_Perfiles" Relationship="Self.FK_tbl_PerfilesUsuarios_tbl_Perfiles" FromRole="tbl_PerfilesUsuarios" ToRole="tbl_Perfiles" />
+          <NavigationProperty Name="tbl_Usuarios" Relationship="Self.FK_tbl_PerfilesUsuarios_tbl_Usuarios" FromRole="tbl_PerfilesUsuarios" ToRole="tbl_Usuarios" />
+        </EntityType>
+        <EntityType Name="tbl_Permisos">
+          <Key>
+            <PropertyRef Name="IdPermiso" />
+          </Key>
+          <Property Name="IdPermiso" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdPerfil" Type="Int32" Nullable="false" />
+          <Property Name="IdModulo" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tbl_Modulos" Relationship="Self.FK_tbl_Permisos_tbl_Modulos" FromRole="tbl_Permisos" ToRole="tbl_Modulos" />
+          <NavigationProperty Name="tbl_Perfiles" Relationship="Self.FK_tbl_Permisos_tbl_Perfiles" FromRole="tbl_Permisos" ToRole="tbl_Perfiles" />
+        </EntityType>
+        <EntityType Name="tbl_TiposDocumentos">
+          <Key>
+            <PropertyRef Name="IdTipoDocumento" />
+          </Key>
+          <Property Name="IdTipoDocumento" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IdEstado" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tbl_Usuarios" Relationship="Self.FK_tbl_Usuarios_tbl_TiposDocumentos" FromRole="tbl_TiposDocumentos" ToRole="tbl_Usuarios" />
+        </EntityType>
+        <EntityType Name="tbl_Usuarios">
+          <Key>
+            <PropertyRef Name="IdUsuario" />
+          </Key>
+          <Property Name="IdUsuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Documento" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="IdTipoDocumento" Type="Int32" Nullable="false" />
+          <Property Name="Nombre" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Usuario" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Clave" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FechaNacimiento" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IdEstado" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tbl_Estados" Relationship="Self.FK_tbl_Usuarios_tbl_Estados" FromRole="tbl_Usuarios" ToRole="tbl_Estados" />
+          <NavigationProperty Name="tbl_PerfilesUsuarios" Relationship="Self.FK_tbl_PerfilesUsuarios_tbl_Usuarios" FromRole="tbl_Usuarios" ToRole="tbl_PerfilesUsuarios" />
+          <NavigationProperty Name="tbl_TiposDocumentos" Relationship="Self.FK_tbl_Usuarios_tbl_TiposDocumentos" FromRole="tbl_Usuarios" ToRole="tbl_TiposDocumentos" />
+        </EntityType>
+        <Association Name="FK_tbl_Modulos_tbl_Estados">
+          <End Role="tbl_Estados" Type="Self.tbl_Estados" Multiplicity="1" />
+          <End Role="tbl_Modulos" Type="Self.tbl_Modulos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Estados">
+              <PropertyRef Name="IdEstado" />
+            </Principal>
+            <Dependent Role="tbl_Modulos">
+              <PropertyRef Name="IdEstado" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Perfiles_tbl_Estados">
+          <End Role="tbl_Estados" Type="Self.tbl_Estados" Multiplicity="1" />
+          <End Role="tbl_Perfiles" Type="Self.tbl_Perfiles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Estados">
+              <PropertyRef Name="IdEstado" />
+            </Principal>
+            <Dependent Role="tbl_Perfiles">
+              <PropertyRef Name="IdEstado" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Usuarios_tbl_Estados">
+          <End Role="tbl_Estados" Type="Self.tbl_Estados" Multiplicity="1" />
+          <End Role="tbl_Usuarios" Type="Self.tbl_Usuarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Estados">
+              <PropertyRef Name="IdEstado" />
+            </Principal>
+            <Dependent Role="tbl_Usuarios">
+              <PropertyRef Name="IdEstado" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Permisos_tbl_Modulos">
+          <End Role="tbl_Modulos" Type="Self.tbl_Modulos" Multiplicity="1" />
+          <End Role="tbl_Permisos" Type="Self.tbl_Permisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Modulos">
+              <PropertyRef Name="IdModulo" />
+            </Principal>
+            <Dependent Role="tbl_Permisos">
+              <PropertyRef Name="IdModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_PerfilesUsuarios_tbl_Perfiles">
+          <End Role="tbl_Perfiles" Type="Self.tbl_Perfiles" Multiplicity="1" />
+          <End Role="tbl_PerfilesUsuarios" Type="Self.tbl_PerfilesUsuarios" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Perfiles">
+              <PropertyRef Name="IdPerfil" />
+            </Principal>
+            <Dependent Role="tbl_PerfilesUsuarios">
+              <PropertyRef Name="IdPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Permisos_tbl_Perfiles">
+          <End Role="tbl_Perfiles" Type="Self.tbl_Perfiles" Multiplicity="1" />
+          <End Role="tbl_Permisos" Type="Self.tbl_Permisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Perfiles">
+              <PropertyRef Name="IdPerfil" />
+            </Principal>
+            <Dependent Role="tbl_Permisos">
+              <PropertyRef Name="IdPerfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_PerfilesUsuarios_tbl_Usuarios">
+          <End Role="tbl_Usuarios" Type="Self.tbl_Usuarios" Multiplicity="1" />
+          <End Role="tbl_PerfilesUsuarios" Type="Self.tbl_PerfilesUsuarios" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Usuarios">
+              <PropertyRef Name="IdUsuario" />
+            </Principal>
+            <Dependent Role="tbl_PerfilesUsuarios">
+              <PropertyRef Name="IdPerfilUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_Usuarios_tbl_TiposDocumentos">
+          <End Role="tbl_TiposDocumentos" Type="Self.tbl_TiposDocumentos" Multiplicity="1" />
+          <End Role="tbl_Usuarios" Type="Self.tbl_Usuarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_TiposDocumentos">
+              <PropertyRef Name="IdTipoDocumento" />
+            </Principal>
+            <Dependent Role="tbl_Usuarios">
+              <PropertyRef Name="IdTipoDocumento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="db_SSTEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="tbl_Estados" EntityType="Self.tbl_Estados" />
+          <EntitySet Name="tbl_Modulos" EntityType="Self.tbl_Modulos" />
+          <EntitySet Name="tbl_Perfiles" EntityType="Self.tbl_Perfiles" />
+          <EntitySet Name="tbl_PerfilesUsuarios" EntityType="Self.tbl_PerfilesUsuarios" />
+          <EntitySet Name="tbl_Permisos" EntityType="Self.tbl_Permisos" />
+          <EntitySet Name="tbl_TiposDocumentos" EntityType="Self.tbl_TiposDocumentos" />
+          <EntitySet Name="tbl_Usuarios" EntityType="Self.tbl_Usuarios" />
+          <AssociationSet Name="FK_tbl_Modulos_tbl_Estados" Association="Self.FK_tbl_Modulos_tbl_Estados">
+            <End Role="tbl_Estados" EntitySet="tbl_Estados" />
+            <End Role="tbl_Modulos" EntitySet="tbl_Modulos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Perfiles_tbl_Estados" Association="Self.FK_tbl_Perfiles_tbl_Estados">
+            <End Role="tbl_Estados" EntitySet="tbl_Estados" />
+            <End Role="tbl_Perfiles" EntitySet="tbl_Perfiles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Usuarios_tbl_Estados" Association="Self.FK_tbl_Usuarios_tbl_Estados">
+            <End Role="tbl_Estados" EntitySet="tbl_Estados" />
+            <End Role="tbl_Usuarios" EntitySet="tbl_Usuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Permisos_tbl_Modulos" Association="Self.FK_tbl_Permisos_tbl_Modulos">
+            <End Role="tbl_Modulos" EntitySet="tbl_Modulos" />
+            <End Role="tbl_Permisos" EntitySet="tbl_Permisos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_PerfilesUsuarios_tbl_Perfiles" Association="Self.FK_tbl_PerfilesUsuarios_tbl_Perfiles">
+            <End Role="tbl_Perfiles" EntitySet="tbl_Perfiles" />
+            <End Role="tbl_PerfilesUsuarios" EntitySet="tbl_PerfilesUsuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Permisos_tbl_Perfiles" Association="Self.FK_tbl_Permisos_tbl_Perfiles">
+            <End Role="tbl_Perfiles" EntitySet="tbl_Perfiles" />
+            <End Role="tbl_Permisos" EntitySet="tbl_Permisos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_PerfilesUsuarios_tbl_Usuarios" Association="Self.FK_tbl_PerfilesUsuarios_tbl_Usuarios">
+            <End Role="tbl_Usuarios" EntitySet="tbl_Usuarios" />
+            <End Role="tbl_PerfilesUsuarios" EntitySet="tbl_PerfilesUsuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_Usuarios_tbl_TiposDocumentos" Association="Self.FK_tbl_Usuarios_tbl_TiposDocumentos">
+            <End Role="tbl_TiposDocumentos" EntitySet="tbl_TiposDocumentos" />
+            <End Role="tbl_Usuarios" EntitySet="tbl_Usuarios" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="db_SSTModelStoreContainer" CdmEntityContainer="db_SSTEntities">
+          <EntitySetMapping Name="tbl_Estados">
+            <EntityTypeMapping TypeName="db_SSTModel.tbl_Estados">
+              <MappingFragment StoreEntitySet="tbl_Estados">
+                <ScalarProperty Name="IdEstado" ColumnName="IdEstado" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Modulos">
+            <EntityTypeMapping TypeName="db_SSTModel.tbl_Modulos">
+              <MappingFragment StoreEntitySet="tbl_Modulos">
+                <ScalarProperty Name="IdModulo" ColumnName="IdModulo" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="IdEstado" ColumnName="IdEstado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Perfiles">
+            <EntityTypeMapping TypeName="db_SSTModel.tbl_Perfiles">
+              <MappingFragment StoreEntitySet="tbl_Perfiles">
+                <ScalarProperty Name="IdPerfil" ColumnName="IdPerfil" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="IdEstado" ColumnName="IdEstado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_PerfilesUsuarios">
+            <EntityTypeMapping TypeName="db_SSTModel.tbl_PerfilesUsuarios">
+              <MappingFragment StoreEntitySet="tbl_PerfilesUsuarios">
+                <ScalarProperty Name="IdPerfilUsuario" ColumnName="IdPerfilUsuario" />
+                <ScalarProperty Name="IdPerfil" ColumnName="IdPerfil" />
+                <ScalarProperty Name="IdUsuario" ColumnName="IdUsuario" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Permisos">
+            <EntityTypeMapping TypeName="db_SSTModel.tbl_Permisos">
+              <MappingFragment StoreEntitySet="tbl_Permisos">
+                <ScalarProperty Name="IdPermiso" ColumnName="IdPermiso" />
+                <ScalarProperty Name="IdPerfil" ColumnName="IdPerfil" />
+                <ScalarProperty Name="IdModulo" ColumnName="IdModulo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_TiposDocumentos">
+            <EntityTypeMapping TypeName="db_SSTModel.tbl_TiposDocumentos">
+              <MappingFragment StoreEntitySet="tbl_TiposDocumentos">
+                <ScalarProperty Name="IdTipoDocumento" ColumnName="IdTipoDocumento" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="IdEstado" ColumnName="IdEstado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Usuarios">
+            <EntityTypeMapping TypeName="db_SSTModel.tbl_Usuarios">
+              <MappingFragment StoreEntitySet="tbl_Usuarios">
+                <ScalarProperty Name="IdUsuario" ColumnName="IdUsuario" />
+                <ScalarProperty Name="Documento" ColumnName="Documento" />
+                <ScalarProperty Name="IdTipoDocumento" ColumnName="IdTipoDocumento" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Usuario" ColumnName="Usuario" />
+                <ScalarProperty Name="Clave" ColumnName="Clave" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="IdEstado" ColumnName="IdEstado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

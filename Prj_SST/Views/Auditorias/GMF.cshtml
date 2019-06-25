@@ -1,0 +1,416 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    window.onload = function () {
+        document.getElementById("PanelDatos").style.visibility = 'hidden';
+    }
+
+    //consulta las auditorias
+    function Consultar() {
+        var _fechaInicial = document.getElementById("txtFechaInicial").value;
+        var _fechaFinal = document.getElementById("txtFechaFinal").value;
+        var _usuario = document.getElementById("txtUsuario").value;
+        var _asociado = document.getElementById("txtAsociado").value;
+        var _objDatos = {};
+        var _actionURL = "/Auditorias/ConsultarGMF";
+
+        if (_fechaInicial == null || _fechaInicial.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar la fecha inicial");
+        } else if (_fechaFinal == null || _fechaFinal.trim() == "") {
+            MostrarPNotify("Error", "", "Debe ingresar la fecha final");
+        } else {
+            _objDatos.FechaInicial = _fechaInicial;
+            _objDatos.FechaFinal = _fechaFinal;
+            _objDatos.Usuario = _usuario;
+            _objDatos.Asociado = _asociado;
+
+            BloquearPagina()
+            $.post(_actionURL, _objDatos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        document.getElementById("PanelDatos").style.visibility = 'hidden';
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        LlenarDatos(_resultado);
+                    }
+                }
+            });
+        }
+    }
+
+    //Llena la tabla con las auditorias
+    function LlenarDatos(Pdatos) {
+        _datos = JSON.parse(Pdatos);
+        if (_datos != null && _datos.length > 0) {
+            document.getElementById("PanelDatos").style.visibility = 'visible';
+            $("#tablaDatosAuditoria").empty();
+            $("#TablaAuditoria").empty();
+
+            var tbl = $("<table/>").attr("id", "TablaAuditoria");
+            tbl.attr("class", "table");
+            $("#tablaDatosAuditoria").append(tbl);
+
+            var InicioEncabezado = "<thead>"
+            var InicioFila = "<tr>"
+            var EncabezadoFechaConsulta = "<th class='text-bold'>Fecha consulta</th>"
+            var EncabezadoAsociado = "<th class='text-bold'>Asociado</th>"
+            var EncabezadoCuenta = "<th class='text-bold'>Cuenta</th>"
+            var EncabezadoTipoTransaccion = "<th class='text-bold'>Tipo transacción</th>"
+            var EncabezadoOficina = "<th class='text-bold'>Oficina</th>"
+            var EncabezadoUsuario = "<th class='text-bold'>Usuario</th>"
+            var EncabezadoNombreUsuario = "<th class='text-bold'>Nombre usuario</th>"
+            var EncabezadoNumeroTransaccion = "<th class='text-bold'>Número transacción</th>"
+            var EncabezadoResultadoProceso = "<th class='text-bold'>Resultado proceso</th>"
+            var EncabezadoReporte = "<th class='text-bold'>Ver reporte</th>"
+            var FinFila = "</tr>"
+            var FinEncabezado = "</thead>"
+
+            $("#TablaAuditoria").append(InicioEncabezado + InicioFila
+                + EncabezadoFechaConsulta + EncabezadoAsociado + EncabezadoCuenta + EncabezadoTipoTransaccion + EncabezadoNumeroTransaccion + EncabezadoResultadoProceso + EncabezadoOficina +
+                EncabezadoUsuario + EncabezadoNombreUsuario + EncabezadoReporte + FinFila + FinEncabezado);
+
+            var ContenidoAbre = '<tbody>';
+            var ContenidoCierra = ' </tbody>';
+
+            $("#TablaAuditoria").append(ContenidoAbre);
+            for (var i = 0; i < _datos.length; i++) {
+                var _FechaConsulta = _datos[i]["FechaConsulta"];
+                var _Caracteres = /-?\d+/;
+                var _valor = _Caracteres.exec(_FechaConsulta);
+                var _Fecha = new Date(parseInt(_valor[0]));
+
+                var _dia = ("0" + (_Fecha.getDate())).slice(-2);
+                var _mes = ("0" + (_Fecha.getMonth() + 1)).slice(-2);
+                var _ano = _Fecha.getFullYear();
+
+                var InicioFila = "<tr>";
+                var columna1 = "<td>" + _ano + "-" + _mes + "-" + _dia + "</td>";
+                var columna2 = "<td>" + _datos[i]["IdAsociado"] + "</td>";
+                var columna3 = "<td>" + _datos[i]["Cuenta"] + "</td>";
+                var columna4 = "<td>" + _datos[i]["TipoTransaccion"] + "</td>";
+                var columna5 = "<td>" + _datos[i]["NumeroTransaccion"] + "</td>";
+                var columna6 = "<td>" + _datos[i]["ResultadoProceso"] + "</td>";
+                var columna7 = "<td>" + _datos[i]["Oficina"] + "</td>";
+                var columna8 = "<td>" + _datos[i]["Usuario"] + "</td>";
+                var columna9 = "<td>" + _datos[i]["NombreUsuario"] + "</td>";
+
+
+                if (_datos[i]["TipoTransaccion"] != 'Consulta') {
+                    var idReporte = '"' + _datos[i]["IdAsociado"] + "~" + _datos[i]["Cuenta"] + "~" + _datos[i]["NumeroTransaccion"] + "~" + _ano + "-" + _mes + "-" + _dia + "~" + _datos[i]["IdTipoTransaccion"] + '"';
+                    var columna10 = "<td> <ul class='icons-list'>"
+                    columna10 = columna10 + "<li class='cursor' onclick='ConsultarReporte(" + idReporte + ")'><i title='Ver reporte' target='_blank' data-popup='tooltip' data-trigger='hover' data-placement='left'></i> <i class='icon-file-text3'></i></li>"
+                    columna10 = columna10 + "</ul>"
+                    columna10 = columna10 + "</td>"
+                    var FinFila = "</tr>";
+
+                    $("#TablaAuditoria").append(InicioFila + columna1 + columna2 + columna3 + columna4 + columna5 + columna6 + columna7 + columna8 + columna9 + columna10 + FinFila);
+                } else {
+                    $("#TablaAuditoria").append(InicioFila + columna1 + columna2 + columna3 + columna4 + columna5 + columna6 + columna7 + columna8 + columna9 + FinFila);
+                }                
+            }
+            $("#TablaAuditoria").append(ContenidoCierra);
+        } else {
+            MostrarPNotify("Error", "", "No se encontraron datos");
+            document.getElementById("PanelDatos").style.visibility = 'hidden';
+            $("#tablaDatosAuditoria").empty();
+            $("#TablaAuditoria").empty();
+        }
+    }
+
+    //Consulta los datos del reporte
+    function ConsultarReporte(PDatos) {
+        var _datosConsulta = PDatos.split("~");
+        var _objDatos = {};
+        _objDatos.IdAsociado = _datosConsulta[0];
+        _objDatos.Cuenta = _datosConsulta[1];
+        _objDatos.NumeroTransaccion = _datosConsulta[2];
+        _objDatos.FechaConsulta = _datosConsulta[3];
+        _objDatos.IdTipoTransaccion = _datosConsulta[4];
+
+        var _actionURL = "/Auditorias/ConsultarReporteGMF";
+        BloquearPagina()
+        $.post(_actionURL, _objDatos, function (_resultado) {
+            DesbloquearPagina();
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    document.getElementById("PanelDatos").style.visibility = 'hidden';
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _datos = JSON.parse(_resultado);
+                    MostrarReporte(_datos);
+                }
+            }
+        });
+    }
+
+    //Muestra la modal que contiene el reporte de EXONERACIÓN Y RETIRO DE GMF
+    function MostrarReporte(PDatos) {
+
+        var _FechaConsulta = PDatos.FechaConsulta;
+        var _Caracteres = /-?\d+/;
+        var _valor = _Caracteres.exec(_FechaConsulta);
+        var _Fecha = new Date(parseInt(_valor[0]));
+
+        var _dia = ("0" + (_Fecha.getDate())).slice(-2);
+        var _mes = ("0" + (_Fecha.getMonth() + 1)).slice(-2);
+        var _ano = _Fecha.getFullYear();
+
+
+        document.getElementById("rptNombre").innerHTML = PDatos.NombreAsociado;
+        document.getElementById("rptNumeroIdentificacion").innerHTML = PDatos.IdAsociado;
+
+        document.getElementById("rptCuenta").innerHTML = PDatos.Cuenta;
+        document.getElementById("rptAsesor").innerHTML = PDatos.NombreUsuario;
+        document.getElementById("rptOficina").innerHTML = PDatos.Oficina;
+        document.getElementById("rptNumTransaccion").innerHTML = PDatos.NumeroTransaccion;
+        document.getElementById("rptResultadoProceso").innerHTML = PDatos.ResultadoProceso;
+        document.getElementById("rptDireccion").innerHTML = PDatos.DireccionReside;
+        document.getElementById("rptTelefono").innerHTML = PDatos.TelReside;
+        document.getElementById("rptFecha").innerHTML = _dia + "-" + _mes + "-" + _ano;
+
+        if (PDatos.IdTipoTransaccion == 1) {
+            document.getElementById("rptTitulo").innerHTML = 'Exoneración';
+            document.getElementById("rptPrimerParrafo").innerHTML = 'Conozco y acepto que la exención prevista en el numeral primero del artículo 879 del estatuto tributario, solo se puede aplicar a una cuenta de ahorros.' +
+                                                                    'Manifiesto, bajo la gravedad de juramento, que realizo la presente solicitud de exención en razón a que a la fecha no gozo del beneficio en ninguna otra cuenta de ahorros.';
+            document.getElementById("rptSegundoParrafo").innerHTML = 'Me comprometo a no solicitar dicha exención ante otro establecimiento de crédito mientras exista la exención, en la cuenta  de ahorros, identificada al final del presente documento,' +
+                                                                    'respecto de la cual se eleva la presente solicitud.'
+            $("#ModalReporteExoneracion").modal();
+        } else if (PDatos.IdTipoTransaccion == 2) {
+            document.getElementById("rptTitulo").innerHTML = 'Retiro exoneración';
+            document.getElementById("rptPrimerParrafo").innerHTML = 'En mi calidad de titular de la cuenta de ahorros que se cita la final de la presente, renuncio a la exención prevista en el numeral primero del artículo 879 del estatuto tributario que' +
+                                                                    'fuera soliciada para esta cuenta en dias anteriores y acepto expresamente las medidas tomadas por Coogranada, tendientes a  controlar en la  presente mensualidad el valor máximo de la exención legal.';
+            document.getElementById("rptSegundoParrafo").innerHTML = 'Lo anterior de conformidad con los mecanismos de verificación contemplados en el decreto 518 del 27 de marzo de 2001, para establecimientos de crédito.'
+
+            $("#ModalReporteExoneracion").modal();
+        }
+    }
+
+    //Cierra la modal que contiene el reporte de EXONERACIÓN Y RETIRO DE GMF
+    function CerrarModal(ventana) {
+        $('#' + ventana).modal('toggle');
+    }
+</script>
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class="icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <label>Fecha inicial:</label><span class="text-danger"> *</span>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                    <input type="text" id="txtFechaInicial" class="form-control calendario" value="@DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")">
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <label>Fecha final:</label><span class="text-danger"> *</span>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                    <input type="text" id="txtFechaFinal" class="form-control calendario" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <div class="form-group">
+                    <label>Usuario:</label>
+                    <input type="text" class="form-control" id="txtUsuario" />
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <div class="form-group">
+                    <label>Asociado:</label>
+                    <input type="text" class="form-control" id="txtAsociado" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12 text-right">
+                <input type="submit" id="btnConsultar" class="btn Gt-btn-verde" value="Consultar" onclick="Consultar()" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelDatos">
+    <div class="panel-body ">
+        <div class="table-responsive scrollTabla">
+            <table id="TablaAuditoria" class="table table-hover"></table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->
+<!-- Modal ReporteExoneracion -->
+<div id="ModalReporteExoneracion" class="modal fade">
+    <div class="modal-dialog modalGmf">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" onclick="CerrarModal('ModalReporteExoneracion')">&times;</button>
+            </div>
+            <div class="modal-body" id="ReporteExoneracion">
+                <div class="col-sm-12 col-xs-12 col-lg-12" id="ReporteExoneracion">
+                    <div class=" col-sm-12 col-xs-12 col-lg-12  text-center ">
+                        <div class="col-sm-4 col-xs-4 col-lg-4">
+                            <img src="~/Images/logo-coogranada.png" class="content-group mt-10 imagenGmf" alt="">
+                        </div>
+
+                        <div class="col-sm-8 col-xs-8 col-lg-8 text-right">
+                            <h6 class="text-uppercase text-bold">Formato de exoneración y retiro de GMF</h6>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-xs-12 col-lg-12 text-right">
+                        <p class="text-bold" id="rptFecha"></p>
+                        <div class=" bg-morado col-sm-12 col-xs-12 col-lg-12 content-group text-center tablaGMF">
+                            <h6 id="rptTitulo" class="text-uppercase text-bold"></h6>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-xs-12 col-lg-12 content-group text-justify ">
+                        <p id="rptPrimerParrafo"></p>
+                        <p id="rptSegundoParrafo"></p>
+                    </div>
+
+                    <!--Datos asociado-->
+                    <div class="col-sm-6 col-xs-6 col-lg-6">
+                        <ul class="list list-unstyled text-left">
+                            <li class="text-bold">Nombre: <span id="rptNombre" class="text-semibold"></span></li>
+                            <li class="text-bold">Número de identificación: <span id="rptNumeroIdentificacion" class="text-semibold"></span></li>
+                            <li class="text-bold">Dirección: <span id="rptDireccion" class="text-semibold"></span></li>
+                            @*<li class="text-bold">E-mail: <span id="rptEmail" class="text-semibold"></span></li>*@
+                        </ul>
+                    </div>
+                    <div class="col-sm-6 col-xs-6 col-lg-6">
+                        <ul class="list list-unstyled text-left">
+                            <li class="text-bold">Cuenta de ahorros: <span id="rptCuenta" class=" text-semibold"></span></li>
+                            <li class="text-bold">Teléfono: <span id="rptTelefono" class=" text-semibold"></span></li>
+                        </ul>
+                    </div>
+                    <!--Fin Datos asociado-->
+                    <!--Huella y firma-->
+                    <div class=" col-sm-12 col-xs-12 col-lg-12">
+                        <div class="col-sm-3 col-xs-3 col-lg-3"></div>
+                        <div class="col-sm-4 col-xs-4 col-lg-4"></div>
+                        <div class="col-sm-2 col-xs-2 col-lg-2">
+                            <div class="panel text-center huellaDactilar">
+                                <div class="panel-body">
+                                    <div class=" col-sm-12 col-xs-12 col-lg-12"><br /> </div>
+                                    <div class=" col-sm-12 col-xs-12 col-lg-12"><br /> </div>
+                                    <div class=" col-sm-12 col-xs-12 col-lg-12"><br /> </div>
+                                    <div class=" col-sm-12 col-xs-12 col-lg-12"><br /> </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" col-sm-12 col-xs-12 col-lg-12">
+                        <div class=" col-sm-2 col-xs-2 col-lg-2"><br /> </div>
+                        <div class="col-sm-4 col-xs-4 col-lg-4 text-center">
+                            <div class="content-group">
+                                <div class="table-responsive no-border">
+                                    <table class="table cke_show_border">
+                                        <tbody>
+                                            <tr class="colum">
+                                                <th class="text-center firma">Firma del titular</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-xs-4 col-lg-4">
+                            <div class="table-responsive no-border">
+                                <table class="table cke_show_border">
+                                    <tbody>
+                                        <tr class="colum">
+                                            <th class="text-center firma">Huella dactilar</th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Huella y firma-->
+                    <!--Datos Coogranada-->
+                    <div class=" col-sm-12 col-xs-12 col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="bg-morado tablaGMF">
+                                    <tr>
+                                        <th class="col-lg-3 text-bold">Asesor</th>
+                                        <th class="col-lg-2 text-bold">Oficina</th>
+                                        <th class="col-lg-3 text-bold">N° de transacción</th>
+                                        <th class="col-lg-3 text-bold">Resultado proceso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="rptAsesor"></td>
+                                        <td id="rptOficina"></td>
+                                        <td id="rptNumTransaccion"></td>
+                                        <td id="rptResultadoProceso"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!--Datos Coogranada-->
+
+                    <div class="col-sm-12 col-xs-12 col-lg-12 text-right">
+                        <div class="col-sm-12 col-xs-12 col-lg-12"><br /></div>
+                        <p>F-8 AHO V2</p>
+                        <div class="col-sm-12 col-xs-12 col-lg-12"><br /></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-verde" onclick="Imprimir('ReporteExoneracion')">Imprimir</button>
+                <button type="button" class="btn Gt-btn-morado" onclick="CerrarModal('ModalReporteExoneracion')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin ReporteExoneracion -->

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+
+  <AsuntoEmailError>ERROR notificaciones ERP Desarrollo</AsuntoEmailError>
+  <AsuntoEmailExcepcion>ERROR notificaciones ERP Desarrollo</AsuntoEmailExcepcion>
+  <BandejaImpresion>Bypass Tray</BandejaImpresion>
+  <CanalVisionamos>04</CanalVisionamos>
+  <CarpetaReportesProveedores>prjProveedores</CarpetaReportesProveedores>
+  <CodCooperativaVisionamos>00000021</CodCooperativaVisionamos>
+  <CodDesblqTjta>00</CodDesblqTjta>
+  <ClientSettingsProvider.ServiceUri></ClientSettingsProvider.ServiceUri>
+  <Dominio>coogranada.local</Dominio>
+  <DominioCorreo>coogranada.com.co</DominioCorreo>
+  <EmailEnvia>notificadorws@coogranada.com.co</EmailEnvia>
+  <EmailRecibeErrores>dmonsalve@coogranada.com.co</EmailRecibeErrores>
+  <EmailRecibeExcepciones>dmonsalve@coogranada.com.co</EmailRecibeExcepciones>
+
+  <ImagenInicial>Foto.png</ImagenInicial>
+  <ImpresionLandScape>false</ImpresionLandScape>
+  <IpPublicaCoogranada>200.100.20.25</IpPublicaCoogranada>
+  <NitCIFIN>900572445</NitCIFIN>
+  <NitCoogranada>890981912</NitCoogranada>
+  <NombreProcesoSGF>SGF1</NombreProcesoSGF>
+  <NombreReporteCIFIN>Score CIFIN</NombreReporteCIFIN>
+  <NombreReporteGMF>Gestión GMF</NombreReporteGMF>
+  <OrigenVisionamos>06</OrigenVisionamos>
+  <PerfilesAutorizadores>Asesor Autorizador,</PerfilesAutorizadores>
+  <PregLigPrimGrupo>Cuál es la otra actividad económica que le reporta ingresos,Cuánto dinero gana con su otra actividad</PregLigPrimGrupo>
+  <PregLigSegGrupo>Realiza Exportaciones en moneda extranjera,Realiza Giros en moneda extranjera,Tiene Inversiones en moneda extranjera,Tiene otra actividad financiera en moneda extranjera,Cuál es su otra actividad en moneda extranjera</PregLigSegGrupo>
+  <PregLigTercGrupo>Cuál es su otra actividad en moneda extranjera,</PregLigTercGrupo>
+  <PregLigCuarGrupo>En qué moneda,País donde esta su cuenta en moneada extranjera,Entidad Finanaciera donde tiene su cuenta en el exterior,Monto promedio mensual que transa en su cuenta en el exterior</PregLigCuarGrupo>
+  <PreguntasLigadas>Posee otra actividad económica que le reporte ingresos,Realiza operaciones en moneda extranjera,Tiene otra actividad financiera en moneda extranjera,Posee cuentas en moneda Extranjera</PreguntasLigadas>
+  <PwdCargueVisionamos>A012B345C678D901A111B222C333D444</PwdCargueVisionamos>
+  <PwdPermiElevados>C#196309</PwdPermiElevados>
+  <ReporteScoreCIFIN>rptScoreCIFIN</ReporteScoreCIFIN>
+  <ReporteGestionGMF>rptExoDesExoGMF</ReporteGestionGMF>
+  <RutaArchivosAMOCompara>P:\</RutaArchivosAMOCompara>
+  <RutaArchivosAMO>\\servfs1\Publica$\Prueba\</RutaArchivosAMO>
+  <RutaSGF>C:\\Program Files (x86)\\SGF\\SGF.exe</RutaSGF>
+
+  <ServidorDA>10.6.0.11</ServidorDA>
+  <!--<ServidorReportes>http://99servhp6/ReportServer</ServidorReportes> Producción
+  <ServidorReportes>http://99servpru2/ReportServer</ServidorReportes>Pruebas-->
+  <ServidorReportes>http://cg19570401:900/reportserver</ServidorReportes>
+
+  <ServidorSMTP>99servmail1.coogranada.local</ServidorSMTP>
+  <SucursalVisionamos>0000</SucursalVisionamos>
+  <TerminalVisionamos>0000</TerminalVisionamos>
+  <TiposEmpLaboralDefaul>Rentista de Capital,Agricultor-Ganadero,Independiente Informal</TiposEmpLaboralDefaul>
+  <TiposEmpSinLaboral>Ninguno,Estudiantes,Ama de Casa,Desempleados Mayor 18 años,Sin Ocupación Menor de 18 años</TiposEmpSinLaboral>
+  <TipoTerminalVisionamos>W4</TipoTerminalVisionamos>
+  <UsuarioPermiElevados>notificadorws</UsuarioPermiElevados>
+
+
+
+
+</Configuration>

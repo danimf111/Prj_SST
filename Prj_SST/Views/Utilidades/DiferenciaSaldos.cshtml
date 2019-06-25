@@ -1,0 +1,168 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script>
+    function verificar() {
+        var _nombreArchivo = $('input[type=file]').val().split('\\').pop();
+        var _actionURL = "/Utilidades/ConsultarDiferencias";
+        var _objDatos = {};
+
+
+        if (_nombreArchivo != null && _nombreArchivo != "") {
+            _objDatos.NombreArchivo = _nombreArchivo;
+
+            $.post(_actionURL, _objDatos, function (_resultado) {
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        }
+                    } else {
+                        LlenarDatos(_resultado);
+                    }
+                }
+            });
+        } else {
+            MostrarPNotify("Error", "", "Debe ingresar un archivo");
+        }
+
+
+    }
+
+    function LlenarDatos(_objDatos) {
+        var ContenidoAbre = '<tbody>';
+        var ContenidoCierra = ' </tbody>';
+
+        $("#TablaDatos").append(ContenidoAbre);
+
+        for (var i = 0; i < _objDatos.length; i++) {
+            var InicioFila = "<tr>";
+            var columna1 = "<td class='col-md-1' >" +
+                "<select name='select' class='form-control'> " +
+                "<option selected='selected' value='0'></option> " +
+		        "<option value='opt1'>+</option>" +
+                "<option value='opt1'>-</option>" +
+		        "</select>" +
+
+                "</td>";
+            var columna2 = "<td>" + _objDatos[i]["Documento"] + "</td>";
+            var columna3 = "<td>" + _objDatos[i]["Cuenta"] + "</td>";
+            var columna4 = "<td>" + _objDatos[i]["TipoCuenta"] + "</td>";
+            var columna5 = "<td>" + _objDatos[i]["SaldoCoogranada"] + "</td>";
+            var columna6 = "<td>" + _objDatos[i]["SaldoVisionamos"] + "</td>";
+            var columna7 = "<td>" + _objDatos[i]["Diferencia"] + "</td>";
+            var columna8 = "<td>" + "<input type='number' class='form-control'>" + "</td>";
+            var FinFila = "</tr>";
+
+            $("#TablaDatos").append(InicioFila + columna1 + columna2 + columna3 + columna4 + columna5 + columna6 + columna7 + columna8 + FinFila);
+        }
+
+        $("#TablaDatos").append(ContenidoCierra);
+        //        $("#ModalInfoCuentas").modal();
+
+        //Entidad;
+        //Documento;
+        //Cuenta;
+        //TipoCuenta;
+        //CuentaPrincipal;
+        //ConstanteVisionamos;
+        //SaldoCoogranada;
+        //SaldoVisionamos;
+        //Diferencia;
+        //SaldoCorregido;
+        //SaldoTotal;
+        //FechaActualizacion;
+
+
+
+
+
+
+
+    }
+
+</script>
+
+
+
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class=" icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <div class="col-xs-6 col-md-2 col-lg-2">
+                    <label><i class=" icon-folder-search"></i> Consultar diferencias:</label><span class="text-danger"> *</span>
+
+                </div>
+                <div class="col-xs-6 col-md-6 col-lg-6">
+                    <input type="file" id="fl" accept=".AMO" onchange="verificar()">
+                    <span class="help-block">Seleccione un archivo.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelDatos">
+    <div class="panel-body ">
+
+        <div class="table-responsive scrollTabla">
+            <table id="TablaDatos" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-bold">Tipo Acción</th>
+                        <th class="text-bold">Documento</th>
+                        <th class="text-bold">Cuenta</th>
+                        <th class="text-bold">Tipo Cuenta</th>
+                        <th class="text-bold">Saldo Coogranada</th>
+                        <th class="text-bold">Saldo Visionamos</th>
+                        <th class="text-bold">Diferencia</th>
+                        <th class="text-bold">Saldo Corregido</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Ayuda -->

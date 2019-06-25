@@ -1,0 +1,1052 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+
+    window.onload = function () {
+        ObtenerProducto();
+        ObtenerOficina();
+        ObtenerUsiuario();
+        ObtenerEstadoCuenta();
+        ObtenerOperacionPermitada();
+        ObtenerFormaPago();
+    }
+
+    //Obtener Producto
+    //Obtiene los aportes activos
+    function ObtenerProducto() {
+        var _actionURL = "/Productos/ObtenerAportes";
+        $.post(_actionURL, "", function (_resultado) {
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    LlenarDatosProducto(_resultado);
+                }
+            }
+        }
+        );
+    }
+
+    //llenar datos de producto
+    //Toma los datos Obtenidos de los productos y llena campo como si fuera apertura
+    function LlenarDatosProducto(Datos) {
+
+        var _datos = JSON.parse(Datos)
+
+        for (var contador = 0; contador < _datos.length; contador++) {
+
+            document.getElementById("txtIdProducto").value = _datos[contador].IdProducto;
+            document.getElementById("txtProducto").value = _datos[contador].DescripcionProducto;
+        }
+    }
+
+    //Buscar Productos
+    //Con el filtro de nombre del prodito busca los aportes activos
+    function BuscarProducto() {
+
+        var _nombre = document.getElementById("txtProducto").value;
+
+        var _Datos = {};
+
+        if (_nombre.trim() == "")
+            MostrarPNotify("Error", "", "Debe ingresar ingresar nombre del producto");
+
+        else {
+            _Datos.DescripcionProducto = _nombre;
+
+            var _actionURL = "/Productos/BuscarProductos";
+            $.post(_actionURL, _Datos, function (_resultado) {
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            document.getElementById("txtProducto").value = "";
+                            document.getElementById("txtIdProducto").value = "";
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        MostrarModal(_resultado);;
+                        document.getElementById("txtProducto").value = "";
+                        document.getElementById("txtIdProducto").value = "";
+                    }
+                }
+            });
+        }
+    }
+
+    //Mostrar Modal
+    //Muestra modal con la informacion obtenida de la busqueda de productos, los muestra en una tabla
+    function MostrarModal(Datos) {
+        $("#tablaDatosProductos").empty();
+        $("#TablaProductos").empty();
+        var _productos = JSON.parse(Datos);
+
+        if (_productos.length > 0) {
+            var tbl = $("<table/>").attr("id", "TablaProductos");
+            tbl.attr("class", "table");
+            $("#tablaDatosProductos").append(tbl);
+
+            var _inicioEncabezado = "<thead>"
+            var _inicioFila = "<tr>"
+            var _encabezadoIdProducto = "<th class='text-bold'>Codigo</th>"
+            var _encabezadoProducto = "<th class='text-bold'>Nombre</th>"
+            var _finFila = "</tr>"
+            var _finEncabezado = "</thead>"
+
+            $("#TablaProductos").append(_inicioEncabezado + _inicioFila + _encabezadoIdProducto + _encabezadoProducto + _finFila + _finEncabezado);
+
+            var _contenidoAbre = '<tbody>';
+            var _contenidoCierra = ' </tbody>';
+
+            $("#TablaProductos").append(_contenidoAbre);
+            for (var i = 0; i < _productos.length; i++) {
+                var _inicioFila = "<tr ondblclick='RegistroSeleccionado(this," + _productos[i]['IdTipoProducto'] + " )'>";
+                var _columna1 = "<td  >" + _productos[i]["IdProducto"] + "</td>";
+                var _columna2 = "<td>" + _productos[i]["DescripcionProducto"] + "</td>";
+                var _finFila = "</tr>";
+
+                $("#TablaProductos").append(_inicioFila + _columna1 + _columna2 + _finFila);
+                $("#ModalProductos").modal();
+            }
+            $("#TablaProductos").append(_contenidoCierra);
+        }
+    }
+
+    //Resgistro seleccionado
+    //Selecciona registro de el Aporte buscado en el modal para llenar los campos del producto
+    function RegistroSeleccionado(element, id) {
+
+        var _regitroSelec = element.rowIndex;
+        var _tabla = document.getElementById('TablaProductos');
+        var _celdas = _tabla.rows.item(_regitroSelec).cells;
+        var _celdasLength = _celdas.length;
+
+        for (var contador = 0; contador < _celdasLength; contador++) {
+            var _valorCelda = _celdas.item(contador).innerHTML;
+            if (contador == 0) {
+                document.getElementById("txtIdProducto").value = _valorCelda;
+            } else if (contador == 1) {
+                document.getElementById("txtProducto").value = _valorCelda;
+            }
+            $('#ModalProductos').modal('hide');
+        }
+    }
+
+    //Busca  asociado
+    //Con el filtro de Numero Documento o Nombre busca solo asociado
+    function BuscarAsociado() {
+        var _documento = document.getElementById("txtIdAsociado").value;
+        var _nombre = document.getElementById("txtAsociado").value;
+        var _Datos = {};
+
+
+        if ((_documento.trim() == "") && (_nombre.trim() == ""))
+            MostrarPNotify("Error", "", "Debe ingresar documento o nombre a buscar");
+
+        else {
+            _Datos.PrimerNombre = _nombre;
+            _Datos.NumeroDocumento = _documento;
+
+
+            var _actionURL = "/Productos/BuscarAsociado";
+            $.post(_actionURL, _Datos, function (_resultado) {
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            document.getElementById("txtProducto").value = "";
+                            document.getElementById("txtIdProducto").value = "";
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        MostrarModalAsociado(_resultado);
+                        document.getElementById("txtAsociado").value = "";
+                        document.getElementById("txtIdAsociado").value = "";
+                    }
+                }
+            });
+        }
+    }
+
+    //Mostrar Modal Asociado
+    //Muestra modal con la informacion obtenida de la busqueda de el asociado, los muestra en una tabla
+    function MostrarModalAsociado(Datos) {
+        $("#tablaDatosAsociados ").empty();
+        $("#TablaAsociados").empty();
+        var _asociados = JSON.parse(Datos);
+
+
+        if (_asociados.length > 0) {
+            var tbl = $("<table/>").attr("id", "TablaAsociados");
+            tbl.attr("class", "table");
+            $("#tablaDatosAsociados").append(tbl);
+
+            var _inicioEncabezado = "<thead>"
+            var _inicioFila = "<tr>"
+            var _encabezadoCedula = "<th class='text-bold'>Cedula</th>"
+            var _encabezadoNombre = "<th class='text-bold'>Nombre</th>"
+            var _finFila = "</tr>"
+            var _finEncabezado = "</thead>"
+
+            $("#TablaAsociados").append(_inicioEncabezado + _inicioFila + _encabezadoCedula + _encabezadoNombre + _finFila + _finEncabezado);
+
+            var _contenidoAbre = '<tbody>';
+            var _contenidoCierra = ' </tbody>';
+
+            $("#TablaAsociados").append(_contenidoAbre);
+            for (var i = 0; i < _asociados.length; i++) {
+                var _inicioFila = "<tr ondblclick='RegistroSeleccionadoAsociado(this," + _asociados[i]['NumeroDocumento'] + " )'>";
+                var _columna1 = "<td>" + _asociados[i]["NumeroDocumento"] + "</td>";
+                var _columna2 = "<td>" + _asociados[i]["PrimerNombre"] + " " + _asociados[i]["SegundoNombre"] + " " +
+                                         _asociados[i]["PrimerApellido"] + " " + _asociados[i]["SegundoApellido"] + "</td>";
+                var _finFila = "</tr>";
+
+                $("#TablaAsociados").append(_inicioFila + _columna1 + _columna2 + _finFila);
+                $("#ModalAsociados").modal();
+            }
+            $("#TablaAsociados").append(_contenidoCierra);
+        }
+    }
+
+    //Resgistro seleccionado
+    //Selecciona registro de el Asociado buscado en el modal para llenar los campos del del asociado
+    function RegistroSeleccionadoAsociado(element, id) {
+
+        var _regitroSelec = element.rowIndex;
+        var _tabla = document.getElementById('TablaAsociados');
+        var _celdas = _tabla.rows.item(_regitroSelec).cells;
+        var _celdasLength = _celdas.length;
+
+        for (var contador = 0; contador < _celdasLength; contador++) {
+            var _valorCelda = _celdas.item(contador).innerHTML;
+            if (contador == 0) {
+                document.getElementById("txtIdAsociado").value = _valorCelda;
+            } else if (contador == 1) {
+                document.getElementById("txtAsociado").value = _valorCelda;
+            }
+            $('#ModalAsociados').modal('hide');
+        }
+    }
+
+    //Obtener Oficina
+    //Otiene los datos de la oficina a la que corresponde el asociado logiado
+    function ObtenerOficina() {
+        var _actionURL = "/Productos/ObtenerOficina";
+        $.post(_actionURL, "", function (_resultado) {
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    LlenarDatosOficina(_resultado);
+                }
+            }
+        }
+        );
+    }
+
+    //Llenar Datos Oficina
+    //Toma los datos obtenidos de la oficina y  llena los campos
+    function LlenarDatosOficina(Datos) {
+        var _datos = JSON.parse(Datos);
+
+        document.getElementById("txtIdOficina").value = _datos.NumeroOficina;
+        document.getElementById("txtIdOficina").disabled = true;
+        document.getElementById("txtOficina").value = _datos.Oficina;
+        document.getElementById("txtOficina").disabled = true;
+
+    }
+
+    //Obtener Usuario
+    //Otiene los datos del usuario que se encuentra logiado
+    function ObtenerUsiuario() {
+        var _actionURL = "/Productos/ObtenerUsuario";
+        $.post(_actionURL, "", function (_resultado) {
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    LlenarDatosUsuario(_resultado);
+                }
+            }
+        }
+        );
+    }
+
+    //Llenar Datos Usuario
+    //Toma los datos obtenidos del usuario y llena los campos
+    function LlenarDatosUsuario(Datos) {
+        var _datos = JSON.parse(Datos);
+
+        document.getElementById("txtIdAsesor").value = _datos.IdAsesor;
+        document.getElementById("txtIdAsesor").disabled = true;
+        document.getElementById("txtAsesor").value = _datos.Nombre;
+        document.getElementById("txtAsesor").disabled = true;
+
+    }
+
+    //Obtener Estado cuenta
+    //Otiene los estados de cuenta y llena el campo como si fuera apertura
+    function ObtenerEstadoCuenta() {
+
+        var _Datos = {};
+
+        _Datos.IdEstado = 45; // 45 solo le correspinde al  estado  nuevo, esta pendiente validar
+
+        var _actionURL = "/Productos/ObtenerEstado";
+        $.post(_actionURL, _Datos, function (_resultado) {
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    LlenarDatosEstado(_resultado);
+                }
+            }
+        }
+        );
+    }
+
+    //Llenar Datos Estado
+    //Toma los datos obtenidos del estado  y llena los campos
+    function LlenarDatosEstado(Datos) {
+        var _datos = JSON.parse(Datos)
+
+        for (var contador = 0; contador < _datos.length; contador++) {
+
+            document.getElementById("txtEstadoCuenta").value = _datos[contador].DescripcionEstado;
+            document.getElementById("txtEstadoCuenta").disabled = true;
+        }
+    }
+
+    //Obtener Operacion Permitida
+    //Otiene las operaciones permnitidas y llena el campo como si fuera apertura
+    function ObtenerOperacionPermitada() {
+        var _actionURL = "/Productos/ObtenerOperacionPermitada";
+        $.post(_actionURL, "", function (_resultado) {
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    LlenarDatosOperacionPermitida(_resultado);
+                }
+            }
+        }
+        );
+    }
+
+    //Llenar Datos Operacion Permitida
+    //Toma los datos obtenidos de operaciones permitidas  y llena los campos
+    function LlenarDatosOperacionPermitida(Datos) {
+        var _datos = JSON.parse(Datos)
+
+        for (var contador = 0; contador < _datos.length; contador++) {
+
+            document.getElementById("txtOperacionPermitida").value = _datos[contador].DescripcionOperacion;
+            document.getElementById("txtOperacionPermitida").disabled = true;
+        }
+    }
+
+    //Obtener Forma de Pago
+    //Otiene forma de pago y llena el campo como si fuera apertura
+    function ObtenerFormaPago() {
+        var _actionURL = "/Productos/ObtenerFormaPago";
+        $.post(_actionURL, "", function (_resultado) {
+
+            if (_resultado != null) {
+                if (_resultado.Mensaje != null) {
+                    if (_resultado.TipoAlerta == 'Error') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Informativo') {
+                        MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'Correcto') {
+                        MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                    } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                        MostrarPNotify("Error", "", _resultado.Mensaje);
+                        location.reload();
+                    }
+                } else {
+                    var _formaPago = JSON.parse(_resultado);
+                    var slFormaPago = $("#slFormaPago");
+
+                    for (var i = 0; i < _formaPago.length; i++) {
+                        slFormaPago.append($("<option></option>").val(_formaPago[i]["IdFormaPago"]).html(_formaPago[i]["DescripcionFormaPago"]));
+                    }
+                }
+            }
+        });
+    }
+
+    //Buscar cuenta
+    //con el IdOficina IdProducto y Idconsecutivo se buscan los datos de la cuenta
+    function BuscarCuenta() {
+        var _idOficinas = document.getElementById("txtCuentaOficina").value;
+        var _idProducto = document.getElementById("txtCuentaProducto").value;
+        var _idConsecutivo = document.getElementById("txtCuentaConsecutivo").value;
+        var _idDigito = document.getElementById("txtCuentaDigito").value;
+        var _Datos = {};
+
+        if ((_idOficinas.trim() == "") && (_idProducto.trim() == "") && (_idConsecutivo.trim() == "") && (_idDigito.trim() == ""))
+            MostrarPNotify("Error", "", "Debe ingresar cuenta completa");
+        else {
+            _Datos.IdOficina = _idOficinas;
+            _Datos.IdProducto = _idProducto;
+            _Datos.IdConsecutivo = _idConsecutivo;
+            _Datos.IdDigito = _idDigito;
+
+            var _actionURL = "/Productos/BuscarCuenta";
+            BloquearPagina();
+            $.post(_actionURL, _Datos, function (_resultado) {
+                DesbloquearPagina();
+                if (_resultado != null) {
+                    if (_resultado.Mensaje != null) {
+                        if (_resultado.TipoAlerta == 'Error') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Informativo') {
+                            MostrarPNotify("Informativo", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'Correcto') {
+                            MostrarPNotify("Correcto", "", _resultado.Mensaje);
+                        } else if (_resultado.TipoAlerta == 'NoAutenticacion' || _resultado.TipoAlerta == 'NoPermiso') {
+                            MostrarPNotify("Error", "", _resultado.Mensaje);
+                            location.reload();
+                        }
+                    } else {
+                        LlenarDatosCuenta(_resultado);
+                    }
+                }
+            });
+        }
+    }
+
+    //Llena los datos cuenta
+    //con los datos obtenidos de la busqueda de cuenta
+    function LlenarDatosCuenta(Datos) {
+        var _datos = JSON.parse(Datos)
+
+        for (var contador = 0; contador < _datos.length; contador++) {
+
+            document.getElementById("txtCuentaOficina").value = _datos[contador].IdOficina;
+            document.getElementById("txtCuentaProducto").value = _datos[contador].IdProducto;
+            document.getElementById("txtCuentaConsecutivo").value = _datos[contador].IdConsecutivo;
+            document.getElementById("txtCuentaDigito").value = _datos[contador].IdDigito;
+
+            document.getElementById("txtIdAsociado").value = _datos[contador].NumeroDocumento;
+            document.getElementById("txtIdAsociado").disabled = true;
+
+            document.getElementById("txtAsociado").value = _datos[contador]["PrimerNombre"] + " " + _datos[contador]["SegundoNombre"]
+                                                           + " " + _datos[contador]["PrimerApellido"] + " " + _datos[contador]["SegundoApellido"];
+            document.getElementById("txtAsociado").disabled = true;
+
+            document.getElementById("txtIdAsesor").value = _datos[contador].IdAsesor;
+            document.getElementById("txtIdAsesor").disabled = true;
+            document.getElementById("txtAsesor").value = _datos[contador]["PrimerNombreAsesor"] + " " + _datos[contador]["SegundoNombreAsesor"]
+                                                           + " " + _datos[contador]["PrimerApellidoAsesor"] + " " + _datos[contador]["SegundoApellidoAsesor"];
+            document.getElementById("txtAsesor").disabled = true;
+
+            document.getElementById("txtIdOficina").value = _datos[contador].IdOficina;
+            document.getElementById("txtIdOficina").disabled = true;
+            document.getElementById("txtOficina").value = _datos[contador].DescripcionOficina;
+            document.getElementById("txtOficina").disabled = true;
+
+            document.getElementById("txtIdProducto").value = _datos[contador].IdProducto;
+            document.getElementById("txtIdProducto").disabled = true;
+            document.getElementById("txtProducto").value = _datos[contador].DescripcionProducto;
+            document.getElementById("txtProducto").disabled = true;
+
+            document.getElementById("slFormaPago").value = _datos[contador].IdFormaPago
+
+            document.getElementById("txtEstadoCuenta").value = _datos[contador].DescripcionEstado;
+            document.getElementById("txtEstadoCuenta").disabled = true;
+
+            ObtenerOperacionPermitada();
+        }
+    }
+
+
+</script>
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">Búsqueda</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-toggle="modal" data-target="#ModalAyuda"><i class=" icon-question6 " title="Ayuda" data-popup="tooltip" data-trigger="hover" data-placement="top"></i></a></li>
+                <li><a data-action="collapse"></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="col-xs-12 col-md-12 col-lg-12">
+
+
+                <!-- Inicio Operación -->
+                <label class="col-xs-12 col-md-3 col-lg-1">Operación:</label>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <select name="select" class="form-control" id="slOperacion"></select>
+                </div>
+            </div>
+            <!-- Fin Operación -->
+        </div>
+
+        <div class="col-md-12  col-sm-12 col-lg-12" id="PanelDatos">
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio Cuenta -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Cuenta:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtCuentaOficina" class="form-control">
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtCuentaProducto" class="form-control">
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtCuentaConsecutivo" class="form-control">
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtCuentaDigito" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnCuenta" onclick="BuscarCuenta()" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Cuenta -->
+                <!-- Inicio Oficina -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Oficina:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdOficina" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtOficina" class="form-control">
+                </div>
+                <!-- Fin Oficina -->
+            </div>
+            <br /><br />
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio Asociado -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Asociado:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdAsociado" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtAsociado" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnAsociado" onclick="BuscarAsociado()" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Asociado -->
+                <!-- Inicio Producto -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Producto:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdProducto" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtProducto" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                    <button type="button" id="btnProducto" onclick="BuscarProducto()" class="btn Gt-btn-verde btn-icon legitRipple"><i class="icon-search4"></i></button>
+                </div>
+                <!-- Fin Producto -->
+            </div>
+            <br /><br />
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio Asesor -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Asesor:</label>
+                </div>
+                <div class="col-xs-4 col-md-3 col-lg-1">
+                    <input type="text" id="txtIdAsesor" class="form-control">
+                </div>
+                <div class="col-xs-6 col-md-5 col-lg-3">
+                    <input type="text" id="txtAsesor" class="form-control">
+                </div>
+                <div class="col-xs-1 col-md-1 col-lg-1">
+                </div>
+
+                <!-- Fin Asesor -->
+                <!-- Inicio EstadoCuenta -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Estado cuenta:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <input type="text" id="txtEstadoCuenta" class="form-control">
+                </div>
+                <!-- Fin EstadoCuenta -->
+            </div>
+            <br /><br />
+
+            <div class="col-xs-12 col-md-12 col-lg-12">
+                <!-- Inicio OperacionPermitida -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Operación permitida:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <input type="text" id="txtOperacionPermitida" class="form-control">
+                </div>
+                <div class="col-xs-2 col-md-1 col-lg-1">
+                </div>
+                <!-- Fin OperacionPermitida -->
+                <!-- Inicio FormaPago -->
+                <div class="col-xs-12 col-md-3 col-lg-1">
+                    <label>Forma pago:</label>
+                </div>
+                <div class="col-xs-10 col-md-8 col-lg-4">
+                    <select name="select" class="form-control" id="slFormaPago"></select>
+                </div>
+                <div class="col-xs-2 col-md-1 col-lg-1">
+                </div>
+                <!-- Fin FormaPago -->
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="col-md-12 col-lg-12 col-sm-12 panel panel-default" id="PanelTab">
+    <div class="panel-body">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="tabbable">
+                <ul class="nav nav-tabs nav-tabs-bottom colorBottomTab">
+
+                    <li class="active"><a href="#tab1" data-toggle="tab">Saldos</a></li>
+                    <li><a href="#tab2" data-toggle="tab">Beneficiarios</a></li>
+                    <li><a href="#tab3" data-toggle="tab">Fechas</a></li>
+                    <li><a href="#tab4" data-toggle="tab">Historial</a></li>
+                </ul>
+                <div class="tab-content">
+                    <!-- Inicio tab1 -->
+                    <div class="tab-pane active" id="tab1">
+
+                        <br />
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio SaldoInicial -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Saldo inicial:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoInicial" class="form-control">
+                            </div>
+                            <!-- Fin SaldoInicial -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <!-- Inicio SaldoCanje  -->
+                                <label>Saldo canje:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoCanje" class="form-control">
+                            </div>
+                            <!-- Fin SaldoCanje  -->
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Revalorización  -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Revalorización:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtRevalorizacion " class="form-control">
+                            </div>
+                            <!-- Fin Revalorización  -->
+
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SaldoEfectivo -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Saldo efectivo:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoEfectivo" class="form-control">
+                            </div>
+
+                            <!-- Fin SaldoEfectivo -->
+                        </div>
+
+                        <br /><br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Capitalizacion -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Capitalización:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtCapitalizacion" class="form-control">
+                            </div>
+                            <!-- Fin Capitalizacion -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SaldoTotal -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Saldo total:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSaldoTotal" class="form-control">
+                            </div>
+                            <!-- Fin SaldoTotal -->
+                        </div>
+
+                    </div>
+                    <!-- Fin tab1 -->
+                    <!-- Inicio tab2 -->
+                    <div class="tab-pane" id="tab2">
+                        <br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio DocumentoBeneficiario -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Documento:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtDocumentoBenef" class="form-control">
+                            </div>
+                            <!-- Fin DocumentoBeneficiario -->
+                            <div class="col-xs-12 col-md-1 col-lg-1"> </div>
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <!-- Inicio Parentesco  -->
+                                <label>Parentesco :</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <select name="select" class="form-control" id="slParentesco ">
+                                    <option selected="selected" value="0">-- Seleccione --</option>
+                                    <option value="Automático">Opción 1</option>
+                                    <option value="Automático">Opción 2</option>
+                                    <option value="Automático">Opción 3</option>
+                                </select>
+                            </div>
+                            <!-- Fin Parentesco  -->
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio PrimerApellido -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>1er apellido:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtPrimerApellido" class="form-control">
+                            </div>
+                            <!-- Fin PrimerApellido -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SegundoApellido -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>2do apellido:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSegundoApellido" class="form-control">
+                            </div>
+                            <!-- Fin SegundoApellido -->
+                        </div>
+
+                        <br /><br />
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio PrimerNombre -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>1er nombre:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtPrimerNombre" class="form-control">
+                            </div>
+                            <!-- Fin PrimerNombre -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio SegundoNombre -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>2do nombre:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtSegundoNombre" class="form-control">
+                            </div>
+                            <!-- Fin SegundoNombre -->
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Telefono  -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Teléfono:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-1">
+                                <input type="text" id="txtTelefono" class="form-control">
+                            </div>
+                            <!-- Fin Telefono -->
+                            <div class="col-xs-12 col-md-12 col-lg-3"> </div>
+                            <!-- Inicio Porcentaje   -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Porcentaje:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-1">
+                                <input type="text" id="txtPorcentaje" class="form-con
+                                       trol">
+                            </div>
+                            <!-- Fin Porcentaje -->
+                        </div>
+                        <div class="row">
+                            <br />
+                            <div class="col-xs-12 col-md-12 col-lg-12 text-right">
+                                <input type="submit" id="btnAgregar" class="btn Gt-btn-verde" value="Agregar" />
+                                <input type="submit" id="btnEliminar" class="btn Gt-btn-morado" value="Eliminar" />
+                            </div><br />
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <br />
+                            <div class="table-responsive scrollTabla">
+                                <table id="TablaDatos" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-bold">Documento</th>
+                                            <th class="text-bold">Parentesco</th>
+                                            <th class="text-bold">Primer apellido</th>
+                                            <th class="text-bold">Segundo apellido</th>
+                                            <th class="text-bold">Primer nombre</th>
+                                            <th class="text-bold">Segundo nombre</th>
+                                            <th class="text-bold">Teléfono</th>
+                                            <th class="text-bold">Porcentaje</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                            <td>Dato 8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                            <td>Dato 8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                            <td>Dato 4</td>
+                                            <td>Dato 5</td>
+                                            <td>Dato 6</td>
+                                            <td>Dato 7</td>
+                                            <td>Dato 8</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Fin tab2 -->
+                    <!-- Inicio tab3 -->
+                    <div class="tab-pane" id="tab3">
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Apertura -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Apertura:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtApertura" class="form-control">
+                            </div>
+                            <!-- Fin Apertura -->
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <!-- Inicio UltimaTransaccion   -->
+                                <label>Ultima transacción:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtUltimaTransaccion" class="form-control">
+                            </div>
+                            <!-- Fin UltimaTransaccion  -->
+                        </div>
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <!-- Inicio Retiro -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Retiro:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtRetiro " class="form-control">
+                            </div>
+                            <!-- Fin Retiro  -->
+
+                            <div class="col-xs-12 col-md-12 col-lg-1"> </div>
+                            <!-- Inicio Revalorización  -->
+                            <div class="col-xs-12 col-md-3 col-lg-1">
+                                <label>Revalorización:</label>
+                            </div>
+                            <div class="col-xs-10 col-md-8 col-lg-3">
+                                <input type="text" id="txtRevalorizacion" class="form-control">
+                            </div>
+
+                            <!-- Fin Revalorización -->
+                        </div>
+                    </div>
+                    <!-- Fin tab3 -->
+                    <!-- Inicio tab4 -->
+                    <div class="tab-pane" id="tab4">
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <br />
+                            <div class="table-responsive scrollTabla">
+                                <table id="TablaDatosHistorial" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-bold">Fecha y hora</th>
+                                            <th class="text-bold">Descripción</th>
+                                            <th class="text-bold">Usuario responsable</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dato 1</td>
+                                            <td>Dato 2</td>
+                                            <td>Dato 3</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Fin tab4 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ayuda -->
+<div id="ModalAyuda" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title"><i class="icon-question6"></i>  Ayuda</h6>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Todos los campos marcados con <span class="text-danger">*</span> son obligatorios.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ Fin Modal Productos -->
+
+<div id="ModalProductos" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title">Aportes</h6>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive scrollTabla">
+                    <table id="TablaProductos" class="table table-hover"></table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--/ Fin Modal Productos -->
+<!--/ Fin Modal Asociados -->
+
+<div id="ModalAsociados" class="modal fade">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header bg-morado">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h6 class="modal-title">Asociados</h6>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive scrollTabla">
+                    <table id="TablaAsociados" class="table table-hover"></table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn Gt-btn-morado" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--/ Fin Modal Asociados -->
