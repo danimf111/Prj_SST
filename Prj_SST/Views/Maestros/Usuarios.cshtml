@@ -67,7 +67,7 @@
                     var _TipoIdenti = JSON.parse(_resultado);
                     var slTipoIdenti = $("#slTipoDocumento");
                     for (var i = 0; i < _TipoIdenti.length; i++) {
-                        slTipoIdenti.append($("<option></option>").val(_TipoIdenti[i]["IdLista"]).html(_TipoIdenti[i]["Descripcion"]));
+                        slTipoIdenti.append($("<option></option>").val(_TipoIdenti[i]["IdTipoDocumento"]).html(_TipoIdenti[i]["Descripcion"]));
                     }
                 }
             }
@@ -200,73 +200,62 @@
 
         var _tipoIdenti = document.getElementById("slTipoDocumento").value;
         var _identificacion = document.getElementById("txtDocumento").value;
-        var _nombre = document.getElementById("txtNombre").value;
-        var _segundonombre = document.getElementById("txtSegundoNombre").value;
-        var _apellido = document.getElementById("txtApellido").value;
-        var _segundoapellido = document.getElementById("txtSegundoApellido").value;
-        var _Nombre = _nombre + "," + _segundonombre + "," + _apellido + "," + _segundoapellido;
-        var _area = document.getElementById("slAreas").value;
-        var _cargo = document.getElementById("slCargos").value;
-        var _oficina = document.getElementById("slOficinas").value;
+        var _nombre = document.getElementById("txtNombre").value;  
         var _usuario = document.getElementById("txtUsuario").value;
-        var _extension = document.getElementById("txtExtension").value;
+        var _clave = document.getElementById("txtClave").value;
         var _fechaNacimiento = document.getElementById("txtFechadeNacimiento").value;
-        var _email = document.getElementById("txtEmail").value;
-        var _correcto = ValidarEmail(_email);
+        //var _email = document.getElementById("txtEmail").value;
+        //var _correcto = ValidarEmail(_email);
         var _estado = document.getElementById("slEstado").value;
-        var _usuAutorizador = document.getElementById("slUsuAutorizador").value;
         var _objDatos = {};
-        var _objPerfiles = [];
-        for (var contador = 0; contador < document.getElementById("TablaPerfiles").rows.length ; contador++) {
-            if (contador > 0) {
-                perfil = {};
-                perfil["IdPerfil"] = document.getElementById("TablaPerfiles").rows[contador].getAttribute('id');
-                _objPerfiles.push(perfil);
-            }
-        }
+        //var _objPerfiles = [];
+        //for (var contador = 0; contador < document.getElementById("TablaPerfiles").rows.length ; contador++) {
+        //    if (contador > 0) {
+        //        perfil = {};
+        //        perfil["IdPerfil"] = document.getElementById("TablaPerfiles").rows[contador].getAttribute('id');
+        //        _objPerfiles.push(perfil);
+        //    }
+        //}
 
 
         if (_tipoIdenti == 0)
             MostrarPNotify("Error", "", "Debe seleccionar tipo de documento");
-        else if (_identificacion.trim() == "")
-            MostrarPNotify("Error", "", "Debe ingresar documento");
-        else if (_nombre.trim() == "")
-            MostrarPNotify("Error", "", "Debe ingresar el primer Nombre");
-        else if (_apellido.trim() == "")
-            MostrarPNotify("Error", "", "Debe ingresar el primer Apellido");
-        else if (_area == 0)
-            MostrarPNotify("Error", "", "Debe seleccionar área");
-        else if (_cargo == 0)
-            MostrarPNotify("Error", "", "Debe seleccionar cargo");
-        else if (_oficina == 0)
-            MostrarPNotify("Error", "", "Debe seleccionar oficina");
-        else if (_usuario.trim() == "")
-            MostrarPNotify("Error", "", "Debe ingresar usuario");
-        else if (_fechaNacimiento.trim() == "")
-            MostrarPNotify("Error", "", "Debe ingresar fecha de nacimiento");
-        else if (_email.trim() == "")
-            MostrarPNotify("Error", "", "Debe Ingresar Email");
-        else if (!_correcto)
-            MostrarPNotify("Error", "", "Email es incorrecto");
-        else if (_estado.trim() == "")
-            MostrarPNotify("Error", "", "Debe Seleccionar Estado");
-        else if (_usuAutorizador.trim() == "NA")
-            MostrarPNotify("Error", "", "Debe indicar si el usuario es Autorizador");
+        //else if (_identificacion.trim() == "")
+        //    MostrarPNotify("Error", "", "Debe ingresar documento");
+        //else if (_nombre.trim() == "")
+        //    MostrarPNotify("Error", "", "Debe ingresar el primer Nombre");
+        //else if (_apellido.trim() == "")
+        //    MostrarPNotify("Error", "", "Debe ingresar el primer Apellido");
+        //else if (_area == 0)
+        //    MostrarPNotify("Error", "", "Debe seleccionar área");
+        //else if (_cargo == 0)
+        //    MostrarPNotify("Error", "", "Debe seleccionar cargo");
+        //else if (_oficina == 0)
+        //    MostrarPNotify("Error", "", "Debe seleccionar oficina");
+        //else if (_usuario.trim() == "")
+        //    MostrarPNotify("Error", "", "Debe ingresar usuario");
+        //else if (_fechaNacimiento.trim() == "")
+        //    MostrarPNotify("Error", "", "Debe ingresar fecha de nacimiento");
+        //else if (_email.trim() == "")
+        //    MostrarPNotify("Error", "", "Debe Ingresar Email");
+        //else if (!_correcto)
+        //    MostrarPNotify("Error", "", "Email es incorrecto");
+        //else if (_estado.trim() == "")
+        //    MostrarPNotify("Error", "", "Debe Seleccionar Estado");
+        //else if (_usuAutorizador.trim() == "NA")
+        //    MostrarPNotify("Error", "", "Debe indicar si el usuario es Autorizador");
 
         else {
             _objDatos.IdTipoDocumento = _tipoIdenti;
             _objDatos.Documento = _identificacion;
-            _objDatos.Nombre = _Nombre;
-            _objDatos.IdArea = _area;
-            _objDatos.IdCargo = _cargo;
-            _objDatos.IdOficina = _oficina;
+            _objDatos.Nombre = _nombre;         
+            _objDatos.Clave = _clave;
             _objDatos.Usuario = _usuario;
             _objDatos.FechaNacimiento = _fechaNacimiento;
-            _objDatos.Extension = _extension;
-            _objDatos.Email = _email;
+            //_objDatos.Extension = _extension;
+            //_objDatos.Email = _email;
             _objDatos.IdEstado = _estado;
-            _objDatos.Perfiles = _objPerfiles;
-            _objDatos.Autorizador = _usuAutorizador;
+            //_objDatos.Perfiles = _objPerfiles;
 
             var _actionURL = "/Maestros/GuardarUsuarios";
             BloquearPagina();
@@ -288,7 +277,7 @@
                     else {
                         MostrarPNotify("Correcto", "", "El registro se ha guardado exitosamente");
                         Nuevo();
-                        LimpiarTabla();
+                       // LimpiarTabla();
                     }
                 }
             });

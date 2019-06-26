@@ -17,11 +17,18 @@ namespace Lib_Objetos
         private string strTipoDocumento;
         private int intIdEstado;
         private List<oPerfiles> ltPerfiles;
+        private string strClave;
+
 
         public List<oPerfiles> Perfiles
         {
             get { return ltPerfiles; }
             set { ltPerfiles = value; }
+        }
+        public string Clave
+        {
+            get { return strClave; }
+            set { strClave = value; }
         }
         public string Documento
         {

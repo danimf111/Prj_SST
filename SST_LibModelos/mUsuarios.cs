@@ -61,11 +61,11 @@ namespace Lib_Modelos
                     throw new ArgumentException("Debe ingresar Documento");
                 if (string.IsNullOrWhiteSpace(PobjUsuarios.Nombre))
                     throw new ArgumentException("Debe ingresar el Nombre");
-                      if (string.IsNullOrWhiteSpace(PobjUsuarios.Usuario))
+                if (string.IsNullOrWhiteSpace(PobjUsuarios.Usuario))
                     throw new ArgumentException("Debe ingresar Usuario");
                 if (PobjUsuarios.FechaNacimiento == null)
                     throw new ArgumentException("Debe ingresar fecha de Nacimiento");
-                       if (PobjUsuarios.IdEstado == 0)
+                if (PobjUsuarios.IdEstado == 0)
                     throw new ArgumentException("Debe seleccionar Estado");
 
 
@@ -97,27 +97,21 @@ namespace Lib_Modelos
                     throw new ArgumentException("Debe ingresar Documento");
                 if (string.IsNullOrWhiteSpace(PobjUsuarios.Nombre))
                     throw new ArgumentException("Debe ingresar el Nombre");
-                          if (string.IsNullOrWhiteSpace(PobjUsuarios.Usuario))
+                if (string.IsNullOrWhiteSpace(PobjUsuarios.Usuario))
                     throw new ArgumentException("Debe ingresar Usuario");
                 if (PobjUsuarios.FechaNacimiento == null)
                     throw new ArgumentException("Debe ingresar fecha de Nacimiento");
-                              if (PobjUsuarios.IdEstado == 0)
+                if (PobjUsuarios.IdEstado == 0)
                     throw new ArgumentException("Debe seleccionar Estado");
 
                 tbl_Usuarios _objtbl_Usuarios = new tbl_Usuarios();
                 _objtbl_Usuarios.IdTipoDocumento = PobjUsuarios.IdTipoDocumento;
                 _objtbl_Usuarios.Documento = PobjUsuarios.Documento;
-
                 _objtbl_Usuarios.Nombre = PobjUsuarios.Nombre;
-                //_objtbl_Usuarios.IdArea = PobjUsuarios.IdArea;
-                //_objtbl_Usuarios.IdCargo = PobjUsuarios.IdCargo;
-                //_objtbl_Usuarios.IdOficina = PobjUsuarios.IdOficina;
-                //_objtbl_Usuarios.Usuario = PobjUsuarios.Usuario;
-                //_objtbl_Usuarios.FechaNacimiento = PobjUsuarios.FechaNacimiento;
-                //_objtbl_Usuarios.Email = PobjUsuarios.Email;
-                //_objtbl_Usuarios.Extension = PobjUsuarios.Extension;
-                //_objtbl_Usuarios.IdEstado = PobjUsuarios.IdEstado;
-                //_objtbl_Usuarios.IdTipoUsuario = 2;//Tipo de usuario Empleado
+                _objtbl_Usuarios.Clave = PobjUsuarios.Clave;
+                _objtbl_Usuarios.Usuario = PobjUsuarios.Usuario;
+                _objtbl_Usuarios.FechaNacimiento = PobjUsuarios.FechaNacimiento;
+                _objtbl_Usuarios.IdEstado = PobjUsuarios.IdEstado;
 
                 return _objtbl_Usuarios;
             }
