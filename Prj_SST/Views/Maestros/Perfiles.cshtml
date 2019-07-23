@@ -2,11 +2,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script>
-window.onload = function () {
-    document.getElementById("btnActualizar").disabled = true;
-    Obtener();
- 
-}
+    window.onload = function () {
+        document.getElementById("btnActualizar").disabled = true;
+        Obtener();
+
+    }
     //Obtiene los perfiles
     //Trae a vista las perfiles registradas en bd
     function Obtener() {
@@ -168,44 +168,17 @@ window.onload = function () {
             var ContenidoCierra = ' </tbody>';
 
             $("#TablaPerfiles").append(ContenidoAbre);
-            
 
-            var URL = "/Maestros/VerificarPermisoPerfiles";/// METODO TEMPORAL PARA DELIMITAR LAS OPCIONES DEL FORMULARIO
-            $.post(URL, "", function (_resultado) {/// METODO TEMPORAL PARA DELIMITAR LAS OPCIONES DEL FORMULARIO
-                if (_resultado == "false") {
-                    document.getElementById("txtNombre").disabled = true;
-                    document.getElementById("txtDescripcion").disabled = true;
-                    document.getElementById("slEstado").disabled = true;
-                    document.getElementById("btnActualizar").disabled = true;
-                    document.getElementById("btnGuardar").disabled = true;
-                    document.getElementById("btnNuevo").disabled = true;
+            for (var i = 0; i < _perfiles.length; i++) {
+                var InicioFila = "<tr ondblclick='RegistroSeleccionado(this," + _perfiles[i]['IdPerfil'] + " )'>";
+                var columna1 = "<td>" + _perfiles[i]["Nombre"] + "</td>";
+                var columna2 = "<td>" + _perfiles[i]["Descripcion"] + "</td>";
+                var columna3 = "<td>" + _perfiles[i]["Estado"].Nombre + "</td>";
+                var FinFila = "</tr>";
 
-
-                    for (var i = 0; i < _perfiles.length; i++) {
-                        var InicioFila = "<tr'>";
-                        var columna1 = "<td>" + _perfiles[i]["Nombre"] + "</td>";
-                        var columna2 = "<td>" + _perfiles[i]["Descripcion"] + "</td>";
-                        var columna3 = "<td>" + _perfiles[i]["Lista"].Valor + "</td>";
-                        var FinFila = "</tr>";
-
-                        $("#TablaPerfiles").append(InicioFila + columna1 + columna2 + columna3 + FinFila);
-                    }
-                    $("#TablaPerfiles").append(ContenidoCierra);
-                } else {
-                    for (var i = 0; i < _perfiles.length; i++) {
-                        var InicioFila = "<tr ondblclick='RegistroSeleccionado(this," + _perfiles[i]['IdPerfil'] + " )'>";
-                        var columna1 = "<td>" + _perfiles[i]["Nombre"] + "</td>";
-                        var columna2 = "<td>" + _perfiles[i]["Descripcion"] + "</td>";
-                        var columna3 = "<td>" + _perfiles[i]["Lista"].Valor + "</td>";
-                        var FinFila = "</tr>";
-
-                        $("#TablaPerfiles").append(InicioFila + columna1 + columna2 + columna3 + FinFila);
-                    }
-                    $("#TablaPerfiles").append(ContenidoCierra);
-                }
-            });
-        } else {
-            document.getElementById("PanelDatos").style.visibility = 'hidden';
+                $("#TablaPerfiles").append(InicioFila + columna1 + columna2 + columna3 + FinFila);
+            }
+            $("#TablaPerfiles").append(ContenidoCierra);
         }
     }
 
@@ -231,9 +204,9 @@ window.onload = function () {
                 document.getElementById("txtDescripcion").value = _valorCelda;
             } else if (contador == 2) {
                 if (_valorCelda.toLowerCase() == 'activo') {
-                    document.getElementById("slEstado").value = 3;
+                    document.getElementById("slEstado").value = 1;
                 } else if (_valorCelda.toLowerCase() == 'inactivo') {
-                    document.getElementById("slEstado").value = 4;
+                    document.getElementById("slEstado").value = 2;
                 }
             }
         }
@@ -285,8 +258,8 @@ window.onload = function () {
                         <label>Estado:</label><span class="text-danger"> *</span>
                         <select name="select" class="form-control" id="slEstado">
                             <option selected="selected" value="0">-- Seleccione --</option>
-                            <option value="3">Activo</option>
-                            <option value="4">Inactivo</option>
+                            <option value="1">Activo</option>
+                            <option value="2">Inactivo</option>
                         </select>
                     </div>
                 </div>

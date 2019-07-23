@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GT_LibModelos;
+using GT_LibObjetos;
 using Lib_Objetos;
 using SST_LibModelos;
 
@@ -32,23 +33,23 @@ namespace Lib_Modelos
                 int _intIdEstado;
                 int.TryParse(PstrIdEstado, out _intIdEstado);
 
-                //var _modulos = from modulos in _objdb_SSTEntities.tbl_Modulos
-                //               join estados in _objdb_SSTEntities.tbl_Estados on modulos.IdEstado equals listas.Id_Lista
-                //               where
-                //               (modulos.IdEstado == _intIdEstado || PstrIdEstado.Equals("*"))
-                //               select new oModulos()
-                //               {
-                //                   IdModulo = modulos.IdModulo,
-                //                   Descripcion = modulos.Descripcion,
-                //                   Nombre = modulos.Nombre,
-                //                   IdEstado = modulos.IdEstado,
-                //                   Lista = new oListas()
-                //                   {
-                //                       Valor = estados.Valor
-                //                   }
-                //               };
-                //return _modulos.ToList();
-                return null;
+                var _modulos = from modulos in _objdb_SSTEntities.tbl_Modulos
+                               join estados in _objdb_SSTEntities.tbl_Estados on modulos.IdEstado equals estados.IdEstado
+                               where
+                               (modulos.IdEstado == _intIdEstado || PstrIdEstado.Equals("*"))
+                               select new oModulos()
+                               {
+                                   IdModulo = modulos.IdModulo,
+                                   Descripcion = modulos.Descripcion,
+                                   Nombre = modulos.Nombre,
+                                   IdEstado = modulos.IdEstado,
+                                   Estado = new oEstados()
+                                   {
+                                       Nombre = estados.Nombre
+                                   }
+                               };
+                return _modulos.ToList();
+              
             }
             catch (Exception ex)
             {

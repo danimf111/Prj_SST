@@ -15,7 +15,7 @@ namespace Lib_Objetos
         private int intIdPerfil;
         private oEstados objEstados;
 
-        public oEstados Lista
+        public oEstados Estado
         {
             get { return objEstados; }
             set { objEstados = value; }

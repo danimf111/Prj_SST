@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GT_LibModelos;
+using GT_LibObjetos;
 using Lib_Objetos;
 using SST_LibModelos;
 
@@ -25,24 +26,23 @@ namespace Lib_Modelos
                 int _intIdEstado;
                 int.TryParse(PstrIdEstado, out _intIdEstado);
 
-                //var _Listas = from perfiles in _objdb_SSTEntities.tbl_Perfiles
-                //              join listas in _objdb_SSTEntities.tblListas on perfiles.IdEstado equals listas.Id_Lista
-                //              where
-                //              (perfiles.IdEstado == _intIdEstado || PstrIdEstado.Equals("*"))
-                //              select new oPerfiles()
-                //              {
-                //                  IdPerfil = perfiles.IdPerfil,
-                //                  Descripcion = perfiles.Descripcion,
-                //                  IdEstado = perfiles.IdEstado,
-                //                  Nombre = perfiles.Nombre,
-                //                  Lista = new oListas()
-                //                  {
-                //                      Valor = listas.Valor
-                //                  }
-                //              };
+                var _perfiles = from perfiles in _objdb_SSTEntities.tbl_Perfiles
+                              join estados in _objdb_SSTEntities.tbl_Estados on perfiles.IdEstado equals estados.IdEstado
+                              where
+                              (perfiles.IdEstado == _intIdEstado || PstrIdEstado.Equals("*"))
+                              select new oPerfiles()
+                              {
+                                  IdPerfil = perfiles.IdPerfil,
+                                  Descripcion = perfiles.Descripcion,
+                                  IdEstado = perfiles.IdEstado,
+                                  Nombre = perfiles.Nombre,
+                                  Estado = new oEstados()
+                                  {
+                                      Nombre = estados.Nombre
+                                  }
+                              };
 
-                //return _Listas.ToList();
-                return null;
+                return _perfiles.ToList();
             }
             catch (Exception ex)
             {
